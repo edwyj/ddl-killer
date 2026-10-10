@@ -1,1 +1,258 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{font:16px/1.9 system-ui,sans-serif;color:#403747;background:#faf8fc;margin:0}main{max-width:780px;margin:auto;padding:50px 24px}a{color:#925b9c}h1{line-height:1.3}section{margin:35px 0}</style><link rel="stylesheet" href="/site-theme.css"><script src="/site-theme.js"></script></head><body class="reading-page"><div class="site-theme-bar" data-theme-control></div><main><a href="/">← DDL Killer 官网</a><title>使用帮助 — DDL Killer</title><h1>开始使用 DDL Killer</h1><section><h2>记录与安排</h2><p>进入应用后注册或登录。先把任务放进清单，设置截止日期，再在日历时间轴中安排执行时间。手机长按任务、电脑拖动任务可以调整排期。</p><a href="https://app.ddlkiller.com">进入应用</a></section><section><h2>让 AI 帮忙</h2><p>点击 🎀，描述任务和偏好，查看方案后继续协商。确认后才会应用安排。AI 生成需要联网。</p><p>DDL Killer 是完全免费的软件。官方 AI 免费额度用于让新用户体验助手，判断是否适合自己。这些 AI 调用会增加我们的运营成本，免费额度可能随成本和运行情况调整，具体以应用内显示为准。长期使用建议配置自己的 API Key，或通过 MCP 接入自己的智能体；第三方服务费用按对应服务商规则由你承担，DDL Killer 不收取任何软件使用费用。任何以 DDL Killer 官方名义收取软件使用费用的行为均非官方，请勿付款。</p></section><section><h2>API Key、课表与智能体</h2><p><a href="/website/api-key-help.html">API Key 获取与配置教程</a>　<a href="/kebiao-help.html">课表导入教程</a>　<a href="/mcp-help.html">MCP 连接教程</a></p></section><section><h2>离线与换设备</h2><p>在联网状态登录并完成缓存后，可离线查看和修改基础数据，联网后自动同步。待同步内容请先完成同步，再退出账号或清理浏览器数据。新应用子域名需要重新登录，旧域名的本地缓存不会自动转移。</p><a href="/app">打开旧域名应用，检查未同步数据</a></section><p><a href="/download.html">下载 Android</a> · iOS 用户目前可以通过浏览器使用。</p></main></body></html>
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="从导入课表、记录任务到安排执行时间，了解 DDL Killer 的 AI 助手、离线同步、跨设备使用和数据管理。">
+  <meta name="theme-color" content="#fffdfd">
+  <title>使用帮助 · DDL Killer</title>
+  <link rel="icon" href="/website/assets/logo.png">
+  <link rel="stylesheet" href="/site-theme.css">
+  <script src="/site-theme.js"></script>
+  <style>
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth;scroll-padding-top:28px}
+    body{margin:0;font:16px/1.85 system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;overflow-wrap:break-word}
+    a{text-underline-offset:4px;text-decoration-thickness:1px}
+    a:focus-visible,summary:focus-visible{outline:2px solid var(--site-link);outline-offset:5px;border-radius:3px}
+    .skip-link{position:absolute;top:8px;left:16px;transform:translateY(-160%);padding:8px 14px;z-index:50;background:var(--site-solid)}
+    .skip-link:focus{transform:none}
+    .help-header{max-width:1120px;margin:0 auto;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:20px;border-bottom:1px solid var(--site-line)}
+    html[data-theme] .help-brand{display:inline-flex;align-items:center;gap:11px;color:var(--site-ink);text-decoration:none;line-height:1.4;flex-shrink:0}
+    .help-brand img{width:38px;height:38px;border-radius:11px;display:block}
+    .help-brand strong{display:block;font-size:16px;letter-spacing:.1px}
+    .help-brand small{display:block;color:var(--site-muted);font-size:12px}
+    .header-tools{display:flex;align-items:center;gap:18px;min-width:0}
+    .header-entry{font-size:14px;white-space:nowrap}
+    .reading-page .help-layout{max-width:1120px;margin:0 auto;padding:32px 24px 64px;display:grid;grid-template-columns:192px minmax(0,760px);gap:56px}
+    .help-toc{align-self:start;position:sticky;top:28px;font-size:14px;line-height:1.5}
+    .toc-title{display:block;margin:5px 0 12px;color:var(--site-muted);font-size:12px;font-weight:600}
+    .help-toc ul{list-style:none;padding:0;margin:0}
+    .help-toc li{margin:2px 0}
+    html[data-theme] .reading-page .help-toc a{display:block;padding:9px 11px;background:transparent;border-left:2px solid transparent;border-radius:0 7px 7px 0;color:var(--site-muted);text-decoration:none}
+    html[data-theme] .reading-page .help-toc a:hover,html[data-theme] .reading-page .help-toc a:focus-visible{color:var(--site-link);background:var(--site-pink-soft);border-left-color:var(--site-link)}
+    .help-content{min-width:0}
+    h1{font-size:42px;line-height:1.3;letter-spacing:-1px;margin:0 0 14px}
+    .intro{margin:0 0 28px;padding-bottom:28px;border-bottom:1px solid var(--site-line)}
+    .lead{font-size:18px;line-height:1.8;color:var(--site-muted);margin:0 0 20px;max-width:38em}
+    .intro-actions{display:flex;flex-wrap:wrap;gap:10px}
+    .intro-actions a{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:7px 17px;border:1px solid var(--site-line);border-radius:11px;font-size:14px;font-weight:600;text-decoration:none;background:var(--site-card)}
+    html[data-theme] .intro-actions .primary{background:linear-gradient(110deg,#dc5d77,#8d70cc);border-color:transparent;color:#fff}
+    section{margin:0 0 34px;scroll-margin-top:28px}
+    h2{font-size:23px;line-height:1.5;margin:0 0 12px;letter-spacing:-.3px}
+    h3{font-size:17px;line-height:1.6;margin:22px 0 7px}
+    p{margin:9px 0}
+    ol,ul{padding-left:23px;margin:10px 0}
+    li{margin:6px 0;padding-left:1px}
+    .muted{color:var(--site-muted)}
+    .note{border-left:3px solid var(--site-violet-ink);background:var(--site-violet-soft);border-radius:0 9px 9px 0;padding:12px 16px;margin:15px 0;font-size:14px;line-height:1.8}
+    .note p:first-child{margin-top:0}.note p:last-child{margin-bottom:0}
+    .view-guide{margin:14px 0 0}
+    .view-guide>div{display:grid;grid-template-columns:76px minmax(0,1fr);gap:16px;padding:12px 0;border-bottom:1px solid var(--site-line)}
+    .view-guide dt{font-weight:650}.view-guide dd{margin:0;color:var(--site-muted)}
+    .sync-flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 11px;margin:16px 0;font-size:14px;font-weight:600;color:var(--site-violet-ink)}
+    .sync-flow span{padding:7px 11px;border:1px solid var(--site-line);border-radius:8px;background:var(--site-card)}
+    .sync-flow b{font-weight:400;color:var(--site-faint)}
+    .export-guide{margin:14px 0;border-top:1px solid var(--site-line)}
+    .export-guide>div{padding:12px 0;border-bottom:1px solid var(--site-line)}
+    .export-guide dt{font-weight:650;font-size:15px}.export-guide dd{margin:4px 0 0;color:var(--site-muted);font-size:14px}
+    html[data-theme] .reading-page .help-content details{background:transparent;border:0;border-bottom:1px solid var(--site-line);padding:0;margin:0}
+    .help-content summary{cursor:pointer;font-weight:600;line-height:1.7;padding:14px 0;list-style-position:outside;margin-left:19px;padding-left:3px}
+    .help-content details[open] summary{color:var(--site-link);padding-bottom:5px}
+    .help-content details>p,.help-content details>ul{margin-top:7px;margin-bottom:15px;margin-left:22px;color:var(--site-muted)}
+    .policy{font-size:14px;color:var(--site-muted);line-height:1.85;padding-top:13px;border-top:1px solid var(--site-line);margin-top:18px}
+    .help-footer{padding-top:22px;border-top:1px solid var(--site-line);font-size:13px;color:var(--site-muted)}
+    .help-footer p{margin:5px 0}.help-footer a{margin-right:14px}
+    @media(max-width:820px){
+      .help-header{padding:16px 22px}.header-tools{gap:12px}
+      .reading-page .help-layout{display:block;padding:25px 22px 45px}
+      .help-toc{position:static;margin:0 0 25px;padding-bottom:19px;border-bottom:1px solid var(--site-line)}
+      .toc-title{margin:0 0 8px}.help-toc ul{display:flex;flex-wrap:wrap;gap:5px 7px}.help-toc li{margin:0}
+      html[data-theme] .reading-page .help-toc a{padding:6px 10px;border:1px solid var(--site-line);border-radius:8px;font-size:13px;background:var(--site-card)}
+      html[data-theme] .reading-page .help-toc a:hover{border-color:var(--site-link)}
+      h1{font-size:34px}.lead{font-size:17px}h2{font-size:22px}
+    }
+    @media(max-width:480px){
+      .help-header{padding:15px 18px;gap:10px}.header-entry{display:none}.header-tools{gap:0}.help-brand{gap:9px}
+      .help-brand img{width:34px;height:34px}.help-brand strong{font-size:15px}.help-brand small{font-size:11px}
+      .reading-page .help-layout{padding:22px 18px 36px}
+      h1{font-size:29px;letter-spacing:-.6px}.lead{font-size:16px}.intro{margin-bottom:25px;padding-bottom:23px}
+      section{margin-bottom:29px}h2{font-size:21px}h3{font-size:16px}.view-guide>div{grid-template-columns:54px minmax(0,1fr);gap:13px}
+      .note{padding:11px 13px}.sync-flow{gap:7px;font-size:13px}.sync-flow span{padding:6px 9px}
+    }
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+  </style>
+</head>
+<body class="reading-page">
+  <a class="skip-link" href="#guide-content">跳到使用指南</a>
+  <header class="help-header">
+    <a class="help-brand" href="/" aria-label="返回 DDL Killer 官网">
+      <img src="/website/assets/logo.png" alt="" width="38" height="38">
+      <span><strong>DDL Killer</strong><small>使用帮助</small></span>
+    </a>
+    <div class="header-tools">
+      <a class="header-entry" href="https://app.ddlkiller.com">进入应用</a>
+      <div data-theme-control></div>
+    </div>
+  </header>
+
+  <main class="help-layout">
+    <nav class="help-toc" aria-label="使用帮助目录">
+      <span class="toc-title">在这页找到</span>
+      <ul>
+        <li><a href="#start">第一次使用</a></li>
+        <li><a href="#views">几个页面怎么分工</a></li>
+        <li><a href="#tasks">任务与执行时间</a></li>
+        <li><a href="#courses">导入自己的课表</a></li>
+        <li><a href="#alice">让 Alice 帮忙安排</a></li>
+        <li><a href="#sync">离线、同步与换设备</a></li>
+        <li><a href="#account">账号与数据</a></li>
+        <li><a href="#reminders">开启任务提醒</a></li>
+        <li><a href="#questions">常见问题</a></li>
+      </ul>
+    </nav>
+
+    <article class="help-content" id="guide-content">
+      <div class="intro">
+        <h1>把课表和想做的事，安排在一起</h1>
+        <p class="lead">从记录一件事开始，再为它留出时间。这份指南带你认识任务、课程与日历，也说明数据怎样保存和同步。</p>
+        <div class="intro-actions">
+          <a class="primary" href="https://app.ddlkiller.com">使用网页版</a>
+          <a href="/download.html">下载 Android</a>
+        </div>
+      </div>
+
+      <section id="start">
+        <h2>第一次使用</h2>
+        <ol>
+          <li>打开网页版或 Android 应用，注册或登录账号。注册需要邮箱验证码；已有账号可在「我的 → 邮箱」绑定常用邮箱，以便找回密码。</li>
+          <li>自己的设备可保留登录页的「在此设备启用离线数据」。公共设备建议取消勾选，并在离开前完成同步、退出账号。</li>
+          <li>进入最左侧页面，点左上角菜单，选择「收集箱」或自己的清单，再点 ＋ 记录一个任务。需要上课时，可先到「我的 → 导入课表」。</li>
+        </ol>
+        <p class="muted">网页版与 Android 使用同一账号，可同步已上传的数据。iPhone、iPad 目前请通过浏览器使用。</p>
+      </section>
+
+      <section id="views">
+        <h2>几个页面怎么分工</h2>
+        <p>底部从左到右是清单、日历、DDL 和「我的」。最左侧默认打开「今天」，左上角菜单可以切换清单。</p>
+        <dl class="view-guide">
+          <div><dt>今天</dt><dd>按时间查看当天课程、任务排期和独立日程；今天截止但还未排时间的任务会另列在下方。</dd></div>
+          <div><dt>清单</dt><dd>把事情按课程、项目或用途分类。「收集箱」暂存想法；未归入清单的任务可在「其他」找到。</dd></div>
+          <div><dt>日历</dt><dd>查看实际要做事的时间，以及已导入的课程。可切换日、三日、周或月视图。</dd></div>
+          <div><dt>DDL</dt><dd>关注已过期和未来 30 天内的截止日期。点选日期，看那天到期的任务；没有 DDL 不代表当天没有课程或安排。</dd></div>
+          <div><dt>我的</dt><dd>管理邮箱、课表、AI、提醒、同步、外观与账号数据，也能查看消息和提交反馈。</dd></div>
+        </dl>
+      </section>
+
+      <section id="tasks">
+        <h2>任务与执行时间</h2>
+        <p><strong>截止日期是“最晚何时完成”，日历安排是“准备何时做”。</strong>例如，周五交的作业，可以安排在周三晚上完成；调整执行时间不会自动改变截止日期。</p>
+        <ol>
+          <li>在「收集箱」或某个清单点 ＋，填写标题，按需设置截止日期、优先级、备注和预计用时。</li>
+          <li>点「安排到日历」，选择日期、开始和结束时间，再保存。一个任务当前对应一段执行时间；点时间安排旁的 × 可取消排期，任务仍保留。</li>
+          <li>点任务卡片可再次编辑。在日历的时间轴中，电脑用鼠标拖动、手机长按后拖动，可调整已有个人安排；课程不支持这样移动。</li>
+        </ol>
+        <p>「今天」页或日历里的 ＋ 用来添加有起止时间的<strong>独立日程</strong>，适合运动、聚会等安排；想记录有截止日期的待办，请从清单添加任务。</p>
+        <p>完成后点勾选框。误勾时，展开「已完成」或从左上菜单进入「已完成」，再点一次勾选框即可改回未完成。</p>
+      </section>
+
+      <section id="courses">
+        <h2>导入自己的课表</h2>
+        <ol>
+          <li>打开「我的 → 导入课表 → 如何获得课表」，按学校教程从自己的教务页面导出课表文件。</li>
+          <li>回到应用，点「选择课表文件」，或粘贴导出的 JSON 内容；电脑网页版也可拖入文件，再点「导入课表」。</li>
+          <li>在日历中核对学期起始日期、周次、单双周和上课时间，再开始安排其他事情。</li>
+        </ol>
+        <p>现有导出适配包括山东大学（威海教务页面）和哈尔滨工业大学（深圳），具体适用范围以教程为准。导入会替换账号现有课表，请保留原导出文件；课表截图、Excel 等不能直接当作课表 JSON 导入。</p>
+        <p><a href="/kebiao-help.html">查看课表导入教程</a>。还没有自己的学校，可在导入页点「还没有你的学校？提交课表样本」，按提示提供必要信息。</p>
+      </section>
+
+      <section id="alice">
+        <h2>让 Alice 帮忙安排</h2>
+        <p>点击 🎀 打开 AI 计划助手。告诉它想做什么、什么时候要完成、预计多久，以及希望避开或留出的时间。还没有建好的任务，也可以直接描述，让它提出新任务和排期。</p>
+        <p class="note">例如：“帮我安排这周的作业，尽量放在晚饭后，周六下午留给朋友。用时不确定的先帮我估一下。”</p>
+        <ol>
+          <li>查看方案与「本次要求」。信息不足时补充说明；如果希望先估时，可以明确告诉助手。</li>
+          <li>继续对话调整，选择要采用的安排，再点「应用选中的…项」或「应用安排」，确认后才会写入。</li>
+          <li>可从历史记录找回之前的方案；已应用的安排可尝试「撤销这次应用」。相关内容已被修改或恢复位置被占用时，撤销会停止，请核对后手动调整。</li>
+        </ol>
+        <p class="muted">AI 需要联网，生成、应用和撤销前需先同步本机日历修改。方案仅供参考，请核对日期、用时和冲突；当前不能直接修改课程，也不能把一个任务自动拆成多段排期。</p>
+        <p><a href="/website/api-key-help.html">获取并配置自己的 API Key</a> · <a href="/mcp-help.html">通过 MCP 连接自己的智能体</a></p>
+        <p class="policy">DDL Killer 是完全免费的软件。官方 AI 免费额度用于让新用户体验助手，判断是否适合自己。这些 AI 调用会增加我们的运营成本；助手目前处于测试阶段，免费额度可能随成本和运行情况调整，具体以应用内显示为准。长期使用建议配置自己的 API Key，或通过 MCP 接入自己的智能体。第三方模型或智能体服务的费用按对应服务商规则由你承担，DDL Killer 不收取任何软件使用费用。任何以 DDL Killer 官方名义收取软件使用费用的行为均非官方，请勿付款。</p>
+      </section>
+
+      <section id="sync">
+        <h2>离线、同步与换设备</h2>
+        <p>“已保存到本机”和“已同步”是两件事。本机指你当前使用的浏览器或 Android 应用；只有同步成功的内容，才能在另一台设备登录后看到。</p>
+        <div class="sync-flow" aria-label="数据同步过程">
+          <span>当前设备的修改</span><b aria-hidden="true">→</b><span>同步成功，保存到账号</span><b aria-hidden="true">→</b><span>新设备联网登录后读取</span>
+        </div>
+        <h3>先准备好，再离线使用</h3>
+        <p>登录时勾选「在此设备启用离线数据」，联网进入「我的 → 同步与离线数据」，等待显示「已同步」。网页版如仍提示「网页离线资源准备中」，请继续保持联网。完成准备后，可以离线查看和编辑已下载的清单、任务、日程与课表；AI、邮箱验证等功能仍需联网。</p>
+        <p>取消离线勾选后为公共设备模式：数据只留在当前页面，关闭页面后未同步修改会丢失。不要把这种模式当作离线备份。</p>
+        <h3>有待同步内容或冲突时</h3>
+        <p>出现「待同步…项」时，修改还在本机。恢复网络并打开应用后会尝试自动同步，也可进入「同步与离线数据」点「立即同步」。登录失效时，按提示重新登录原账号，本机修改会保留。</p>
+        <p>出现「有修改需要处理」时，比较「本机修改」与「线上当前内容」，选择「保留我的修改并重新同步」或「放弃这次修改，使用线上版本」。如果线上内容已删除，可能需要先导出本机内容，再重新创建。</p>
+        <h3>换设备、退出或清理之前</h3>
+        <p>先在旧设备确认「已同步」，再到新设备联网登录同一账号。正常退出会清除当前设备的本地数据，已同步的在线数据保留；有待同步修改时，应用会阻止直接退出或切换账号。</p>
+        <p>无法同步时，先点「导出本机数据与待同步修改」，确认文件确实已保存，再决定如何处理。清理浏览器网站数据、更换浏览器或卸载应用，也可能移除这份本地数据；<strong>未同步内容不会自动转移到其他设备。</strong></p>
+        <div class="note"><strong>两种导出用途不同：</strong>「同步与离线数据」里的导出包含本机内容和待同步修改；「安全与隐私」里的「导出我的数据」只导出服务器已收到的账号资料。导出文件请妥善保管，目前没有一键导入全部数据的恢复入口。</div>
+      </section>
+
+      <section id="account">
+        <h2>账号与数据</h2>
+        <ul>
+          <li><strong>邮箱与密码：</strong>在「我的 → 邮箱」绑定或更换邮箱。更换需要当前密码、新旧邮箱验证码；原邮箱无法收信时，请联系开发者核实处理。登录页的「忘记密码？」可通过已绑定并验证的邮箱设置新密码，尚未绑定邮箱的旧账号需联系开发者。验证码 10 分钟内有效；没有收到，请重试或联系开发者。</li>
+          <li><strong>导出资料：</strong>先确认已同步，再到「我的 → 安全与隐私 → 导出我的数据」，联网输入当前密码后保存文件。</li>
+          <li><strong>删除与还原：</strong>左上菜单的「回收站」可还原误删内容。回收站按当前规则保留 7 天，已完成任务保留 3 天后永久清理；「清空」或「永久删除」无法撤销。</li>
+          <li><strong>退出与注销：</strong>「安全与隐私」提供退出所有设备和永久注销账号。注销会删除在线账号资料与任务等数据，不能撤销；历史备份按保留期限清理，请先导出需要的资料。</li>
+        </ul>
+        <p><a href="/privacy.html">阅读完整隐私说明</a></p>
+      </section>
+
+      <section id="reminders">
+        <h2>开启任务提醒</h2>
+        <ol>
+          <li>编辑任务，在「提醒」中选择截止时、提前提醒或自定义时间，再保存。只有日期而没有截止时刻的任务，可选截止当天 09:00。</li>
+          <li>到「我的 → 任务提醒」，点「开启 / 检查权限」，按系统提示授权，再点「发送测试提醒」检查效果。</li>
+        </ol>
+        <p>每台设备都需要分别开启通知。安卓已同步提醒由系统触发，准时提醒还需要允许系统的「闹钟和提醒」权限，部分手机还需允许后台运行；其他设备修改任务后，请打开本机应用同步，才能更新本机提醒。网页版后台推送需要浏览器、系统允许通知，并能连接推送服务，不能保证断网时送达。</p>
+        <p class="muted">默认隐藏通知中的任务内容，可在提醒设置中调整；不授予通知权限，也能正常使用清单和日历。</p>
+      </section>
+
+      <section id="questions">
+        <h2>常见问题</h2>
+        <details>
+          <summary>为什么任务在清单里，却没出现在 DDL 页？</summary>
+          <p>先确认设置的是「截止日期」，而不只是「安排到日历」的执行时间。DDL 页聚焦已过期和未来 30 天内的任务；更远期任务会保留在原清单，临近后再纳入。</p>
+        </details>
+        <details>
+          <summary>手机和电脑的数据不一致怎么办？</summary>
+          <p>确认使用同一账号，并在两端打开「我的 → 同步与离线数据」点「立即同步」。先处理待同步修改、登录失效或冲突；正式版与 Beta 的业务数据独立，不会互相同步。</p>
+        </details>
+        <details>
+          <summary>课表日期或上课时间不对怎么办？</summary>
+          <p>核对导出时选择的学期、第 1 周日期、周次和作息，确认教程适用于自己的校区与教务系统。课程来自导入课表，不能用拖动个人任务的方式改课；修正文件后重新导入，再检查实际日期。</p>
+        </details>
+        <details>
+          <summary>AI 没生成方案，或者提示暂时不能继续？</summary>
+          <p>先检查网络、同步状态及应用显示的额度或等待时间；使用自己的 Key 时，到「AI 计划助手设置」先保存配置，再「测试连接」。不要反复点击发送；按提示重试，并可从历史记录核对是否已有方案。仍有问题请提交反馈，附错误提示即可，不要附 Key 或密码。</p>
+        </details>
+        <details>
+          <summary>误勾、误删或误应用了安排，怎么处理？</summary>
+          <p>误勾任务可在「已完成」里再次点勾；误删内容可在「回收站」点「还原」，到期或永久清理后无法找回。AI 应用可从历史记录尝试「撤销这次应用」；若相关内容已变化，按提示手动调整。</p>
+        </details>
+        <details>
+          <summary>发现问题，或者想建议适配自己的学校？</summary>
+          <p>到「我的 → 问题与建议」说明操作步骤、预期效果和实际结果，可附去掉个人信息的截图；回复在「我的 → 消息」查看。课表需求也可从导入页的学校反馈入口提交，不要发送教务密码、Cookie 或他人的课表。</p>
+        </details>
+      </section>
+
+      <footer class="help-footer">
+        <p><a href="/">返回官网</a><a href="/website/api-key-help.html">API Key 教程</a><a href="/kebiao-help.html">课表教程</a><a href="/mcp-help.html">智能体连接</a></p>
+        <p>更新于 2026-10-10 · 按 DDL Killer 0.13.2 现有功能编写；具体入口及可用功能以当前应用为准。</p>
+      </footer>
+    </article>
+  </main>
+</body>
+</html>

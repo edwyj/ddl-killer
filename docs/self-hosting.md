@@ -193,11 +193,14 @@ https://localhost:8443 {
 以下命令均在仓库根目录执行：
 
 ```sh
+docker version
 docker compose --env-file .env.self-host -f compose.self-host.yaml config --quiet
 docker compose --env-file .env.self-host -f compose.self-host.yaml up -d --build
 docker compose --env-file .env.self-host -f compose.self-host.yaml ps
 docker compose --env-file .env.self-host -f compose.self-host.yaml logs --tail=50 plan-api caddy
 ```
+
+`docker version` 应同时显示 Client 和 Server 信息。只显示 Client、提示无法连接 daemon 时，说明 Docker 引擎还没有正常运行；先解决 Docker 的启动问题，再执行 Compose。`config --quiet` 只检查配置能否解析，不代表镜像已经构建或服务已经启动。
 
 浏览器账号使用 `Secure`、`HttpOnly` Cookie，应使用 HTTPS。Caddy 为本机生成的 CA 需要安装到自己的可信证书库，不能只忽略浏览器的证书报错。
 
@@ -227,6 +230,14 @@ sudo update-ca-certificates
 ```json
 {"enabled":false,"registration_requires_email":true}
 ```
+
+如果只想先检查 HTTPS 和 API，无需把证书导入系统，可以让本次命令单独信任导出的 CA：
+
+```sh
+curl --cacert ./caddy-local-root.crt https://localhost:8443/api/health
+```
+
+应返回 `{"ok":true}`。Windows PowerShell 中请使用 `curl.exe`，避免旧版 PowerShell 将 `curl` 解释为另一个命令。不要用 `-k` 跳过证书验证来判断 HTTPS 是否配置成功；浏览器日常使用仍需完成前面的信任设置。
 
 ## 5. 初始化第一个账号
 
@@ -267,6 +278,24 @@ PY
 成功返回 `{"ok":true}`。回到网页，用刚创建的账号登录。再次初始化返回 HTTP 403“已初始化”，这是正常行为。至少完成一次任务创建、刷新页面和重新登录，确认数据持久化。
 
 新实例第一次开放访问前，先完成初始化，避免由其他人先创建首个账号。下面公网部署前仍建议保留本机绑定，完成初始化后再开放端口。
+
+### 本机启动后的验收
+
+先关闭邮件、AI 和语音等外部服务，只检查基本功能，避免把外部服务配置问题混在一起：
+
+1. 打开网页并登录，确认页面、字体和图标正常，能看到默认清单。
+2. 新建一条任务，设置截止日期并安排一个时间段；刷新网页，核对任务与日历中的安排。
+3. 导入仓库提供的[虚构演示课表](examples/timetable-demo.json)，核对课程日期和时间；不要拿他人的真实课表做公开测试材料。这个演示文件的学期日期固定，查看时切到文件对应的日期。
+4. 将任务标记为完成，在“已完成”中找到它，再取消完成，确认能恢复到原清单。
+5. 在这台设备启用离线数据并等待首次同步完成；断网修改一条任务，再恢复联网，等同步完成后重新登录核对。另开一个已联网的设备或浏览器核对同一条记录，可以进一步确认跨设备同步。
+6. 执行下面的停止命令，再按第 4 节启动；重新登录，确认任务、课表和安排还在。这个检查需要保留数据卷，不能使用 `down -v`。
+
+```sh
+docker compose --env-file .env.self-host -f compose.self-host.yaml down
+docker compose --env-file .env.self-host -f compose.self-host.yaml up -d
+```
+
+需要 MCP 时，再按第 9 节创建只读令牌，确认客户端能读清单且没有写入工具；用可安排权限测试“生成草案 → 查看 → 确认”，确认草案生成时不会立即改动日程，最后撤销令牌并检查连接确实失效。
 
 ## 6. 配置自己的公网域名
 
@@ -471,4 +500,30 @@ docker compose --env-file .env.self-host -f compose.self-host.yaml down
 - AI 自定义地址的公网 HTTPS 限制使本地或内网模型不能直接接入。目前也没有纯浏览器、无后端的 AI Key 模式。
 - Web 和 Android 是本文核实的构建目标；仓库中的其他平台目录不代表已经完成发布适配。运行时的业务语言主要为中文。
 
-本文的核实依据为后端启动与环境变量校验、Compose/Dockerfile、Flutter API来源和Android签名配置、本文 Compose 模板的静态配置校验，以及临时空库的初始化、重复初始化、登录和清单接口检查。文中的独立 Compose 模板仍需在部署者机器上完成容器、TLS和浏览器验收；不要将源码核对当作已替自己的环境部署成功。
+## 启动失败时先检查什么
+
+| 现象 | 检查方法 |
+| --- | --- |
+| 无法连接 Docker daemon，或 Docker Desktop 自己弹出启动错误 | 先运行 `docker version`，确认 Server 可用。此时应用容器尚未启动，先按 Docker 官方排障说明处理；不要为启动应用直接恢复出厂设置或删除已有卷。 |
+| Compose 提示环境变量或环境文件不存在 | 确认在仓库根目录执行、`.env.self-host` 已创建，且命令包含 `--env-file .env.self-host`；不要把真实配置贴到公开 Issue。 |
+| Caddyfile 被当成目录，或挂载失败 | 确认 `Caddyfile.self-host` 是存在的文件，并且独立 Compose 中的挂载源已经改成 `./Caddyfile.self-host`。 |
+| 网页空白，或找不到 `main.dart.js`、字体、`offline-sw.js` | 重新完成第 1 节构建及离线 worker 检查，确认 `app/build/web/` 中存在实际产物；只创建空目录不能代替构建。 |
+| 证书报错 | 核对访问地址、端口和导出的 CA 是否属于当前实例；不要混用其他实例的 CA，也不要用忽略证书验证作为长期方案。 |
+| API 返回 502 | 查看 `plan-api`、`public-mcp`、`caddy` 日志和容器状态，确认后端没有因缺少密钥或数据库写入失败而退出；启动瞬间的短暂 502 应在后端就绪后消失。 |
+| 登录或修改操作返回“不受信任的来源” | 检查 `PUBLIC_ORIGIN`、`APP_ORIGIN` 与浏览器地址栏的协议、域名、端口完全一致；修改环境后重新创建 `plan-api` 容器。 |
+| 未配置邮件时不能注册 | 这是当前注册要求；先按第 5 节初始化一个账号，多用户注册再配置邮件服务。 |
+
+日志检查命令：
+
+```sh
+docker compose --env-file .env.self-host -f compose.self-host.yaml ps
+docker compose --env-file .env.self-host -f compose.self-host.yaml logs --tail=100 plan-api public-mcp caddy
+```
+
+分享日志前删去邮箱、令牌、私有地址和个人任务内容；不要上传环境文件、数据库或 CA 私钥。Docker 自身的启动问题可参考 [Docker Desktop 官方排障说明](https://docs.docker.com/desktop/troubleshoot/overview/)。
+
+## 已核实的范围
+
+2026-10-10 从公开 Git 快照导出干净副本，重新安装依赖并构建 Flutter Web，生成的离线 worker 通过 63 个本地资源及更新生命周期检查；根 Compose 与复制后修改挂载源的独立配置均通过 `docker compose config`，公开 Caddy 配置通过实际 Caddy 校验。在隔离的本机 Node 24 与 Caddy 进程中，以实例 CA 验证真实 HTTPS，完成空库初始化、重复初始化拒绝、Web 登录 Cookie、来源校验、任务/排期/虚构课表、同步重试幂等、完成与撤销、重启后的 SQLite 数据和会话持久化，以及 MCP 只读权限、草案确认、令牌撤销和 OAuth PKCE 流程验收。
+
+上述本机进程验收不等于容器验收：该次测试机器的 Docker Desktop 在启动自身 Inference 服务时失败，没有运行 Compose 容器或检验 Docker 卷。完整 Docker 构建、容器重建后的数据卷、浏览器真实离线交互、Android APK 和公网域名证书仍需在可用环境中完成。邮件实收、外部模型和语音调用也应由部署者按自己的服务配置分别验收；不要把本文核对记录视为已经替自己的环境部署成功。
