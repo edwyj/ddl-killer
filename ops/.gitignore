@@ -1,0 +1,3 @@
+__pycache__/
+# 本机真实 Beta 账号名单，示例见 beta-accounts.example.json
+/beta-accounts.json

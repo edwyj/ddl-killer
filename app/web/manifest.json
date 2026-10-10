@@ -1,0 +1,35 @@
+{
+    "name": "DDL Killer",
+    "short_name": "DDL Killer",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#FFFDFD",
+    "theme_color": "#FFFDFD",
+    "description": "DDL Killer — AI 计划助手、清单、DDL、课表与每日时间轴",
+    "orientation": "portrait-primary",
+    "prefer_related_applications": false,
+    "icons": [
+        {
+            "src": "icons/Icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-maskable-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "icons/Icon-maskable-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ]
+}

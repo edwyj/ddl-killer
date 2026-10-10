@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>如何获得课表 · DDL Killer</title>
+<meta name="description" content="用油猴脚本从山大教务系统导出整学期课表，导入 DDL Killer。你的账号密码不会离开你的浏览器。">
+
+<!--
+  ═══════════════════════════════════════════════════════════════════════════
+   要加截图？把图片丢进同目录的 kbimg/ 文件夹，用下面这些文件名就行，
+   HTML 一个字都不用改 —— 图片不存在时页面会自动显示一个虚线占位框。
+
+     kbimg/01-install-tampermonkey.png    装油猴：扩展商店页面
+     kbimg/02-allow-userscripts.png       Edge / Chrome：打开「允许用户脚本」开关（最重要的一张）
+     kbimg/03-install-script.png          装脚本：拖入窗口 / 粘贴保存
+     kbimg/03b-tampermonkey-disabled.png  油猴图标带红色叉号 = 没生效（行内小图，不放 figure）
+     kbimg/06-export-button.png           右下角的「📤 导出课表」按钮
+     kbimg/08-json-file.png               下载到的 schedule.json
+     kbimg/09-import-app.png              App「我的」页里的「导入课表」入口
+     kbimg/10-f12-console.png             F12 控制台里的自检日志
+
+   建议图片宽度 1200px 上下，页面会自动缩放适配。
+   注意：图片是【立即加载】的，故意没加 loading="lazy" —— 懒加载会让首屏之外的图
+   不去请求，也就永远触发不了 onerror，占位框就显示不出来，反而不知道漏了哪几张。
+  ═══════════════════════════════════════════════════════════════════════════
+-->
+
+<style>
+  :root{
+    --ink:#1f2328; --ink-2:#4a5259; --ink-3:#6b757e;
+    --line:#e4e7eb; --bg:#ffffff; --bg-2:#f7f8fa;
+    --brand:#5C8DEF; --brand-ink:#2c5fb8;
+    --warn-bg:#fff8e6; --warn-line:#f0c36d; --warn-ink:#8a5a00;
+    --tip-bg:#eef4ff;  --tip-line:#a9c6f5;  --tip-ink:#1f4a94;
+    --bad-bg:#fdeeee;  --bad-line:#f0b0b0;  --bad-ink:#9c2b2b;
+    --ok:#2f9e5f;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%; scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font:16px/1.75 system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  }
+  .wrap{max-width:780px; margin:0 auto; padding:40px 20px 96px}
+
+  h1{font-size:30px; line-height:1.3; margin:0 0 6px; letter-spacing:-.4px}
+  .sub{color:var(--ink-3); font-size:15px; margin:0 0 28px}
+  h2{font-size:21px; margin:44px 0 12px; padding-top:20px; border-top:1px solid var(--line); letter-spacing:-.2px}
+  h2:first-of-type{border-top:0; padding-top:0}
+  h3{font-size:16.5px; margin:26px 0 8px}
+  p{margin:12px 0}
+  a{color:var(--brand-ink); text-decoration:none; border-bottom:1px solid #c6d8f7}
+  a:hover{border-bottom-color:var(--brand-ink)}
+  code{
+    background:var(--bg-2); border:1px solid var(--line); border-radius:5px;
+    padding:1px 6px; font-size:14px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Courier New",monospace;
+  }
+  kbd{
+    background:#fff; border:1px solid #c9ced4; border-bottom-width:2px; border-radius:5px;
+    padding:1px 7px; font-size:13.5px; font-family:inherit; white-space:nowrap;
+  }
+
+  /* 学校切换 */
+  .schools{
+    display:flex; flex-wrap:wrap; align-items:center; gap:8px;
+    margin:0 0 22px; padding-bottom:16px; border-bottom:1px solid var(--line); font-size:14.5px;
+  }
+  .schools .lb{color:var(--ink-3); margin-right:2px}
+  .schools a{
+    display:inline-block; padding:4px 13px; border-radius:999px;
+    border:1px solid var(--line); background:#fff; color:var(--ink-2); border-bottom-width:1px;
+  }
+  .schools a:hover{border-color:var(--brand); color:var(--brand-ink)}
+  .schools a.on{
+    background:var(--brand); border-color:var(--brand); color:#fff; font-weight:600;
+  }
+  .schools a.on:hover{color:#fff}
+
+  /* 导语 */
+  .lead{
+    background:var(--tip-bg); border:1px solid var(--tip-line); border-left:4px solid var(--brand);
+    border-radius:10px; padding:16px 18px; margin:0 0 8px; color:var(--tip-ink); font-size:15.5px;
+  }
+  .lead strong{color:inherit}
+
+  /* 步骤 */
+  .step{
+    border:1px solid var(--line); border-radius:14px; padding:22px 24px;
+    margin:22px 0; background:#fff; box-shadow:0 1px 2px rgba(16,24,40,.04);
+  }
+  .step > h2{
+    border-top:0; padding-top:0; margin:0 0 4px; font-size:19px;
+    display:flex; align-items:center; gap:11px;
+  }
+  .num{
+    flex:0 0 auto; width:29px; height:29px; border-radius:50%;
+    background:var(--brand); color:#fff; font-size:15px; font-weight:700;
+    display:inline-flex; align-items:center; justify-content:center; line-height:1;
+  }
+  .step .goal{color:var(--ink-3); font-size:14px; margin:0 0 6px 40px}
+
+  /* 安装/下载按钮 */
+  .dl{margin:16px 0}
+  .dl a{
+    display:inline-block; background:var(--brand); color:#fff; border:0; border-radius:9px;
+    padding:10px 18px; font-size:15.5px; font-weight:600; box-shadow:0 1px 2px rgba(16,24,40,.12);
+  }
+  .dl a:hover{background:var(--brand-ink)}
+  .dl a .v{font-weight:400; opacity:.85; font-size:13px; margin-left:3px}
+  .dl .url{display:block; margin-top:8px; color:var(--ink-3); font-size:12.5px; word-break:break-all}
+
+  /* 提示框 */
+  .box{border-radius:10px; padding:13px 16px; margin:16px 0; font-size:15px; border:1px solid}
+  .box > :first-child{margin-top:0}
+  .box > :last-child{margin-bottom:0}
+  .box .t{font-weight:700; display:block; margin-bottom:3px}
+  .warn{background:var(--warn-bg); border-color:var(--warn-line); color:var(--warn-ink)}
+  .tip {background:var(--tip-bg);  border-color:var(--tip-line);  color:var(--tip-ink)}
+  .bad {background:var(--bad-bg);  border-color:var(--bad-line);  color:var(--bad-ink)}
+  .ok  {background:#eefaf1; border-color:#a9e0bf; color:#1d6b40}
+
+  ol,ul{margin:12px 0; padding-left:22px}
+  li{margin:7px 0}
+  ol.steps-list > li{margin:11px 0}
+
+  /* 图 */
+  figure{margin:18px 0}
+  /* 截图尺寸不一（1132px 的大页面 vs 376px 的油猴小弹窗），窄的居中放，别贴着左边缘。 */
+  figure img{max-width:100%; height:auto; display:block; margin:0 auto; border:1px solid var(--line); border-radius:10px}
+  figcaption{color:var(--ink-3); font-size:13.5px; margin-top:7px}
+  .ph{
+    display:none; border:1.5px dashed #c3cad2; border-radius:10px; background:var(--bg-2);
+    padding:26px 18px; text-align:center; color:var(--ink-3); font-size:13.5px; line-height:1.7;
+  }
+  .ph b{display:block; color:var(--ink-2); font-size:14px; margin-bottom:4px; font-weight:600}
+  .ph code{background:#fff; font-size:12.5px}
+
+  /* 行内小图：工具栏图标这类 64px 级截图，跟文字并排就行。
+     别塞进 figure —— 撑到整页宽会糊成一团，也没必要占一整行。 */
+  .aside{display:flex; gap:12px; align-items:center; margin:14px 0; font-size:15px}
+  .aside > p{margin:0}
+  .aside img{flex:0 0 auto; width:64px; height:auto; border:1px solid var(--line); border-radius:8px}
+  .aside .ph-sm{
+    display:none; flex:0 0 64px; padding:10px 6px; text-align:center;
+    border:1.5px dashed #c3cad2; border-radius:8px; background:var(--bg-2);
+    color:var(--ink-3); font-size:11px; line-height:1.6;
+  }
+  .aside .ph-sm b{display:block; margin-bottom:3px}
+  .aside .ph-sm code{background:#fff; font-size:10px; word-break:break-all}
+
+  /* FAQ */
+  details{border:1px solid var(--line); border-radius:10px; padding:0 16px; margin:12px 0; background:#fff}
+  details[open]{background:var(--bg-2)}
+  summary{cursor:pointer; padding:14px 0; font-weight:600; font-size:15.5px; list-style:none}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"＋ "; color:var(--brand); font-weight:700}
+  details[open] summary::before{content:"－ "}
+  details > :not(summary){margin-top:0}
+  details > *:last-child{margin-bottom:16px}
+
+  /* 目录 */
+  .toc{background:var(--bg-2); border:1px solid var(--line); border-radius:12px; padding:16px 22px; margin:26px 0 8px}
+  .toc .t{font-weight:700; font-size:14px; color:var(--ink-3); margin-bottom:6px; letter-spacing:.4px}
+  .toc ol{margin:0; padding-left:20px}
+  .toc li{margin:4px 0; font-size:15px}
+  .toc a{border-bottom:0}
+  .toc a:hover{border-bottom:1px solid var(--brand-ink)}
+
+  /* 目录跳转的落点：留点余量，别让标题紧贴窗口顶端 */
+  h2[id], .step[id]{scroll-margin-top:18px}
+
+  /* 表格 */
+  .tw{overflow-x:auto; margin:16px 0}
+  table{border-collapse:collapse; width:100%; font-size:14.5px; min-width:440px}
+  th,td{border:1px solid var(--line); padding:9px 12px; text-align:left; vertical-align:top}
+  th{background:var(--bg-2); font-weight:600}
+
+  footer{margin-top:56px; padding-top:22px; border-top:1px solid var(--line); color:var(--ink-3); font-size:13.5px}
+  .tamper{color:#d0021b; font-weight:600}
+</style><link rel="stylesheet" href="/site-theme.css">
+<script src="/site-theme.js"></script></head>
+
+<body class="reading-page"><div class="site-theme-bar" data-theme-control></div>
+<div class="wrap">
+
+<nav class="schools">
+  <span class="lb">支持的学校</span>
+  <a class="on" href="/kebiao-help.html">山东大学</a>
+  <a href="/hitsz-kebiao-help.html">哈工大（深圳）</a>
+</nav>
+
+<h1>如何获得课表</h1>
+<div class="lead">
+  <b>目前支持的学校：山东大学、哈尔滨工业大学（深圳）。</b><br>
+  其他学校还在陆续接入。欢迎你提供课表样本，帮助我们更快支持你的学校。🎀<br>
+  你可以在 DDL Killer「我的 → 导入课表 → 提交课表样本」留下学校信息和样本。
+  样本确认能帮助我们完善课表导入后，我们会送上一份 AI 体验奖励，感谢你的帮助。
+  <a href="#contribute">看看怎样提供样本</a>
+</div>
+<p class="sub">从山大教务系统导出整学期课表，导入 DDL Killer。全程在你自己电脑上完成，<b>不需要把账号密码交给任何人</b>。</p>
+
+<div class="lead">
+  最后你会得到一个叫 <code>schedule.json</code> 的文件。把它里面的内容粘进 DDL Killer 的
+  「导入课表」，课表就进去了 —— 这门课在第几周、周几、第几节、哪个教室，全都有。
+  <br><br>整个过程大约 5 分钟，其中 20 秒是脚本替你翻课表。
+</div>
+
+<div class="toc">
+  <div class="t">本页内容</div>
+  <ol>
+    <li><a href="#why">先说清楚：为什么不是"填账号密码"</a></li>
+    <li><a href="#need">开始之前，确认这三件事</a></li>
+    <li><a href="#s1">装油猴（Tampermonkey）</a></li>
+    <li><a href="#s2">Edge / Chrome 要多开一个开关 ⚠️</a></li>
+    <li><a href="#s3">装课表导出脚本</a></li>
+    <li><a href="#s4">登录教务系统</a></li>
+    <li><a href="#s5">点「导出课表」，等 20 秒</a></li>
+    <li><a href="#s6">把结果导入 DDL Killer</a></li>
+    <li><a href="#faq">出问题了 / 常见问题</a></li>
+    <li><a href="#privacy">安全与隐私说明</a></li>
+    <li><a href="#contribute">帮助适配其他学校</a></li>
+  </ol>
+</div>
+
+
+<h2 id="why">先说清楚：为什么不是"填账号密码"</h2>
+
+<p>
+  你可能会想：直接在这 App 里填学号密码不就行了？答案是<b>做不到，也不该做</b>。
+</p>
+
+<p>
+  山大的教务系统在<b>新设备首次登录时会发短信验证码</b>。所以任何要你「把账号密码交给某个网站或 App」
+  的方案，要么根本登不上去，要么就意味着你的密码被存到了别人的服务器上 —— 而这台服务器可能只是
+  某个同学的一台电脑。
+</p>
+
+<p>所以这里反过来做：</p>
+
+<div class="box tip">
+  <span class="t">用你自己的浏览器、你自己的登录态去读，只把结果（一张课表）交出去。</span>
+  脚本在你浏览器里跑，用的是你此刻已经登录好的身份，跟你在页面上自己翻课表点来点去是同一回事。
+  它读完就结束了，账号密码从头到尾没离开过你的浏览器。
+</div>
+
+
+<h2 id="need">开始之前，确认这三件事</h2>
+
+<ol class="steps-list">
+  <li><b>用电脑</b>。目前只支持电脑浏览器（Chrome / Edge / Firefox），手机不行。</li>
+  <li><b>能登录教务系统</b>。网址是 <code>bkzhjx.wh.sdu.edu.cn</code>，需要你的学号和密码。</li>
+  <li><b>大概 5 分钟</b>。第一次装脚本稍微麻烦点，装完以后每学期只要点一下按钮。</li>
+</ol>
+
+
+<!-- ══════════ 1 ══════════ -->
+<div class="step" id="s1">
+  <h2><span class="num">1</span>装油猴（Tampermonkey）</h2>
+  <p class="goal">油猴是一个浏览器扩展，负责运行我们要用的脚本。</p>
+
+  <p>在你的浏览器扩展商店里搜索 <b>Tampermonkey</b>，或者直接点下面的链接：</p>
+
+  <ul>
+    <li>Edge：<a href="https://microsoftedge.microsoft.com/addons/detail/tampermonkey/iikmkjmpaadaobahmlepeloendndfphd" target="_blank" rel="noopener">Edge 加载项商店 · Tampermonkey</a></li>
+    <li>Chrome：<a href="https://chromewebstore.google.com/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo" target="_blank" rel="noopener">Chrome 应用商店 · Tampermonkey</a></li>
+    <li>Firefox：<a href="https://addons.mozilla.org/firefox/addon/tampermonkey/" target="_blank" rel="noopener">Firefox 附加组件 · Tampermonkey</a></li>
+  </ul>
+
+  <p>
+    点「获取」/「添加到浏览器」，确认安装。装完之后，浏览器<b>右上角工具栏</b>会出现一个
+    Tampermonkey 图标（两个重叠的小方块，黑白的或彩色的）。
+  </p>
+
+  <div class="box tip">
+    <span class="t">找不到图标？</span>
+    点地址栏右边的「🧩 扩展」拼图按钮，在列表里找到 Tampermonkey，点它右边的图钉把它固定到工具栏上。
+  </div>
+
+  <figure>
+    <img src="kbimg/01-install-tampermonkey.png" alt="扩展商店中的 Tampermonkey 安装页面"         onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+    <div class="ph"><b>截图待补</b>扩展商店里的 Tampermonkey 安装页<br><code>kbimg/01-install-tampermonkey.png</code></div>
+    <figcaption>在扩展商店里安装 Tampermonkey。</figcaption>
+  </figure>
+</div>
+
+
+<!-- ══════════ 2 ══════════ -->
+<div class="step" id="s2">
+  <h2><span class="num">2</span>Edge / Chrome 要多开一个开关 ⚠️</h2>
+  <p class="goal">Firefox 没有这道闸，用 Firefox 的话可以直接跳过这一步。</p>
+
+  <div class="box bad">
+    <span class="t">跳过这一步的症状</span>
+    脚本装了、图标也亮着，但教务页面<b>什么反应都没有</b>：右下角没有按钮，按 F12 看控制台也没有任何日志。
+    油猴弹窗里点开脚本会写着「<b>此脚本还未被执行</b>」。
+  </div>
+
+  <p>
+    Edge 和 Chrome 都有一道闸：扩展默认<b>不允许运行用户脚本</b>。Tampermonkey 会在页面上方弹一条蓝色横幅提醒你，
+    内容是「请启用"允许用户脚本"扩展设置」—— 看到它就说明是这个问题。
+  </p>
+
+  <p>打开它：</p>
+
+  <ol class="steps-list">
+    <li>地址栏输入 <code>edge://extensions/</code>（Chrome 是 <code>chrome://extensions/</code>）回车，打开扩展管理页。</li>
+    <li>左下角把 <b>「开发人员模式」</b>打开（如果还没开）。</li>
+    <li>找到 <b>Tampermonkey</b> 那张卡片，把 <b>「允许用户脚本」</b>开关打开。</li>
+    <li>回到教务系统页面，按 <kbd>F5</kbd> 刷新。</li>
+  </ol>
+
+  <figure>
+    <img src="kbimg/02-allow-userscripts.png" alt="浏览器扩展页里 Tampermonkey 卡片上的「允许用户脚本」开关"         onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+    <div class="ph"><b>截图待补</b>扩展页中 Tampermonkey 卡片上的「允许用户脚本」开关<br><code>kbimg/02-allow-userscripts.png</code></div>
+    <figcaption>Edge 和 Chrome 都要在扩展页里手动打开「允许用户脚本」（开关位置一样，图为 Edge）。</figcaption>
+  </figure>
+</div>
+
+
+<!-- ══════════ 3 ══════════ -->
+<div class="step" id="s3">
+  <h2><span class="num">3</span>装课表导出脚本</h2>
+  <p class="goal">把 <code>sdu-kebiao-export.user.js</code> 装进油猴。</p>
+
+  <p><b>方式一（推荐）：</b>直接点下面的按钮。装好油猴的浏览器会自动弹出油猴的安装页，点<b>「安装」</b>就完事了。</p>
+
+  <p class="dl">
+    <a href="https://ddlkiller.com/userscript/sdu-kebiao-export.user.js" target="_blank" rel="noopener">📥 安装「山大 课表导出」脚本<span class="v">v1.0.5</span></a>
+    <span class="url">安装地址：https://ddlkiller.com/userscript/sdu-kebiao-export.user.js</span>
+  </p>
+
+  <div class="box tip">
+    <span class="t">点完没弹出安装页？</span>
+    新标签页里出现的如果是一堆代码、而不是油猴的安装页，说明油猴还没接管这个页面 ——
+    多半是<a href="#s2">第 2 步</a>那个「允许用户脚本」开关没打开。回去把它打开，再点一次按钮。
+  </div>
+
+  <p>
+    <b>方式二（点了没反应）：</b>在按钮上<b>右键 →「链接另存为」</b>，存成一个
+    <code>.user.js</code> 文件，再把它<b>拖进浏览器窗口</b>，油猴同样会弹出安装页。
+  </p>
+
+  <p><b>方式三（拖拽也不管用）：</b>手动把源码粘进油猴。</p>
+  <ol class="steps-list">
+    <li>点工具栏上的 Tampermonkey 图标 → <b>管理面板</b>。</li>
+    <li>点 <b>「+」</b> 新建脚本。</li>
+    <li>编辑器里有一段模板代码，<b><kbd>Ctrl</kbd>+<kbd>A</kbd> 全选删掉</b>。</li>
+    <li>打开<a href="https://ddlkiller.com/userscript/sdu-kebiao-export.user.js" target="_blank" rel="noopener">上面的安装地址</a>，<b><kbd>Ctrl</kbd>+<kbd>A</kbd> 全选、<kbd>Ctrl</kbd>+<kbd>C</kbd> 复制</b>，粘贴进去，<kbd>Ctrl</kbd>+<kbd>S</kbd> 保存。</li>
+  </ol>
+
+  <p>
+    装好后，管理面板里应该出现一条名为 <b>「山大 课表导出 → DDL Killer」</b> 的脚本，
+    右侧开关是<b>打开</b>的。如果它是灰的，点一下打开。
+  </p>
+
+  <figure>
+    <img src="kbimg/03-install-script.png" alt="油猴图标弹出的菜单里，已启用的「山大 课表导出 → DDL Killer」"         onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+    <div class="ph"><b>截图待补</b>油猴图标弹窗里的脚本条目（已启用）<br><code>kbimg/03-install-script.png</code></div>
+    <figcaption>装好后点油猴图标，能看到这条脚本，并且是已启用状态。</figcaption>
+  </figure>
+
+  <div class="aside">
+    <img src="kbimg/03b-tampermonkey-disabled.png" alt="油猴工具栏图标，右下角有一个红色叉号"
+         onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+    <div class="ph-sm"><b>截图待补</b><code>kbimg/03b-tampermonkey-disabled.png</code></div>
+    <p>
+      反过来，工具栏上的油猴图标如果带个<b>红色叉号</b>，就是这个样子 —— 说明脚本
+      <b>没在当前这页跑起来</b>：多半是<a href="#s2">第 2 步</a>那个开关还没打开；
+      开关开着的话，就确认下地址栏是不是 <code>bkzhjx.wh.sdu.edu.cn</code>。
+    </p>
+  </div>
+</div>
+
+
+<!-- ══════════ 4 ══════════ -->
+<div class="step" id="s4">
+  <h2><span class="num">4</span>登录教务系统</h2>
+  <p class="goal">用你自己的学号密码正常登录，该收的短信验证码照收。</p>
+
+  <p>
+    打开 <a href="https://bkzhjx.wh.sdu.edu.cn" target="_blank" rel="noopener">https://bkzhjx.wh.sdu.edu.cn</a>
+    并登录。如果这台电脑是第一次登录，会要求短信验证码 —— 正常走流程就行。
+  </p>
+
+  <div class="box tip">
+    <span class="t">脚本不参与登录</span>
+    登录完全是你和教务系统之间的事，脚本只是在页面加载完之后往页面右下角放一个按钮而已。
+  </div>
+
+</div>
+
+
+<!-- ══════════ 5 ══════════ -->
+<div class="step" id="s5">
+  <h2><span class="num">5</span>点「导出课表」，等 20 秒</h2>
+  <p class="goal">这一下就把整学期的课表翻完。</p>
+
+  <p>
+    在教务页面的<b>右下角</b>找到蓝色按钮 <b>「📤 导出课表」</b>，点它。
+  </p>
+
+  <p>
+    接下来它在按钮上方显示进度：<code>抓取第 7/20 周…</code>。
+    脚本会一周一周地翻课表（每周之间停顿 0.2 秒，不给学校服务器压力），大概 20 秒跑完。
+    <b>这期间别关页面</b>。
+  </p>
+
+  <div class="box tip">
+    <span class="t">为什么要翻 20 周？</span>
+    因为有些课不是整个学期都上 —— 比如某门课只上前 8 周，另一门只在第 5、7、9、11 周上。
+    只翻一周会漏掉一大半课程，所以脚本老老实实把整个学期翻一遍再合并去重。
+  </div>
+
+  <figure>
+    <img src="kbimg/06-export-button.png" alt="教务页面右下角的「导出课表」按钮，以及它上方的完成提示"         onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+    <div class="ph"><b>截图待补</b>页面右下角的「📤 导出课表」按钮<br><code>kbimg/06-export-button.png</code></div>
+    <figcaption>按钮固定在窗口右下角，滚到哪都在。抓完会在它正上方弹出结果和下一步提示。</figcaption>
+  </figure>
+
+  <p>跑完之后，浏览器会自动下载一个文件：<b><code>schedule.json</code></b>（一般在「下载」文件夹里）。</p>
+
+  <figure>
+    <img src="kbimg/08-json-file.png" alt="下载到的 schedule.json 文件"         onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+    <div class="ph"><b>截图待补</b>下载文件夹里的 schedule.json<br><code>kbimg/08-json-file.png</code></div>
+    <figcaption>导出的文件。</figcaption>
+  </figure>
+</div>
+
+
+<!-- ══════════ 6 ══════════ -->
+<div class="step" id="s6">
+  <h2><span class="num">6</span>把结果导入 DDL Killer</h2>
+  <p class="goal">最后一步。</p>
+
+  <p>打开 DDL Killer，点底部最右边的 <b>齿轮</b>进「我的」页，里面有 <b>导入课表</b>。进去之后可以任选一种方式：</p>
+  <p><b>推荐：点「选择课表文件」</b>，在手机的文件选择器或电脑的文件窗口中找到 <code>schedule.json</code>。读取后，确认内容并点<b>导入课表</b>。Android App、手机网页版和电脑网页版都可以使用。取消选择不会更改现有课表；应用只读取你选中的文件。</p>
+
+  <ol class="steps-list">
+    <li>
+      <b>把 <code>schedule.json</code> 直接拖进页面</b>（网页版推荐）。
+      文件拖到窗口上方时整页会变蓝、中间浮出「松手导入课表」，松手就自动导入并保存。
+    </li>
+    <li>
+      拖拽不方便的话：用记事本（或 VS Code、或任何文本编辑器）打开 <code>schedule.json</code>，
+      <b><kbd>Ctrl</kbd>+<kbd>A</kbd> 全选、<kbd>Ctrl</kbd>+<kbd>C</kbd> 复制</b>，
+      再粘贴进输入框，点<b>导入课表</b>。
+    </li>
+  </ol>
+
+  <div class="box tip">
+    <span class="t">拖拽只有电脑网页版有</span>
+    手机 App 和手机网页版可以点「选择课表文件」，也可以粘贴内容；电脑网页版还支持拖拽。导入后的课表完全一样。
+  </div>
+
+  <div class="box ok">
+    <span class="t">完成</span>
+    课表已经进来了。之后脚本和油猴都可以留着 —— 下学期换个学期编号再来一次就行；
+    不想留也可以随时删，删掉不影响已经导入的课表。
+  </div>
+
+  <figure>
+    <img src="kbimg/09-import-app.png" alt="DDL Killer「我的」页里的「导入课表」入口"         onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+    <div class="ph"><b>截图待补</b>DDL Killer 的「导入课表」页面<br><code>kbimg/09-import-app.png</code></div>
+    <figcaption>「我的」页（底部齿轮）里的「导入课表」。选择文件、拖拽和粘贴都从这个页面进。</figcaption>
+  </figure>
+</div>
+
+
+<!-- ══════════ FAQ ══════════ -->
+<h2 id="faq">出问题了 / 常见问题</h2>
+
+<details>
+  <summary>右下角没有按钮，页面上什么都没有</summary>
+
+  <p>按可能性从高到低排查：</p>
+
+  <ol class="steps-list">
+    <li>
+      <b>按 <kbd>F12</kbd> 打开控制台，看有没有这一行：</b>
+      <div class="tw">
+        <table>
+          <tr><th>你看到的</th><th>说明</th><th>怎么办</th></tr>
+          <tr>
+            <td>完全没有这行</td>
+            <td>脚本压根没在这页跑起来</td>
+            <td>看下面第 2、3 条</td>
+          </tr>
+          <tr>
+            <td>有这行，<code>选定宿主=</code> 是 <code>(无，本层不放按钮)</code></td>
+            <td>脚本跑了，但没找到能放按钮的地方</td>
+            <td>把这行截图发给维护者</td>
+          </tr>
+          <tr>
+            <td>有这行，宿主也对，就是看不见按钮</td>
+            <td>按钮被页面自己的元素盖住了</td>
+            <td>把这行截图发给维护者</td>
+          </tr>
+        </table>
+      </div>
+      <p>正常应该长这样：</p>
+      <p><code>[课表导出] 已注入 v1.0.4 | url=… | 本层=… | 有body=… | 子frame数=… | 选定宿主=…</code></p>
+    </li>
+
+    <li>
+      <b>用 Edge 的话，检查「允许用户脚本」开关。</b>
+      这是最常见的坑，见上面<a href="#s2">第 2 步</a>。油猴弹窗里如果写着「此脚本还未被执行」，八成就是它。
+    </li>
+
+    <li>
+      <b>确认当前页面是教务系统。</b>
+      地址栏必须是 <code>bkzhjx.wh.sdu.edu.cn</code> 开头。如果你停在统一身份认证
+      <code>pass.sdu.edu.cn</code>，脚本不会在那里运行 —— 先登录完回到教务系统。
+    </li>
+
+    <li>
+      <b>确认脚本是打开的。</b>
+      点油猴图标，看「山大 课表导出 → DDL Killer」左边的开关是不是灰的。灰的点一下。
+    </li>
+
+    <li>
+      <b>装完之后要刷新页面。</b>
+      脚本只在页面加载时注入，所以装好脚本后回到教务页面按一下 <kbd>F5</kbd>。
+    </li>
+  </ol>
+
+  <figure>
+    <img src="kbimg/10-f12-console.png" alt="F12 控制台里的自检日志"         onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+    <div class="ph"><b>截图待补</b>F12 控制台里的自检日志<br><code>kbimg/10-f12-console.png</code></div>
+    <figcaption>控制台里的那行自检日志。</figcaption>
+  </figure>
+</details>
+
+<details>
+  <summary>提示「没读到课表」</summary>
+  <p>
+    最常见的是<b>登录过期了</b>。刷新页面、重新登录（该收的短信验证码照收），
+    回到智慧教学平台的首页再点一次导出。
+  </p>
+  <p>
+    还有一种情况：页面停在<b>选课系统的入口页</b>（只有选课期间登录才会遇到，平时见不到）。
+    那里读不到课表 —— 点一下页面上的「进入首页」，进到智慧教学平台再导出就行。
+  </p>
+</details>
+
+<details>
+  <summary>导出的课不全 / 少了几门</summary>
+  <p>
+    脚本会抓满 20 周再合并去重，正常情况下不会漏。如果发现明显不对：
+  </p>
+  <ul>
+    <li>确认导出时页面已经进到<b>智慧教学平台</b>（能看到「我的课程」）。</li>
+    <li>重新导出一次 —— 中途网络抖动可能让某一周没抓到。</li>
+    <li>还是不对的话，把导出的 <code>schedule.json</code> 和教务页面截图发给维护者。</li>
+  </ul>
+</details>
+
+<details>
+  <summary>会不会误操作、改坏我的课？</summary>
+  <p>
+    <b>不会。</b>脚本<b>只读</b>：全程只发「查询课表」这一种请求，<b>不碰任何选课 / 退课 / 提交接口</b>。
+    它做的事情，等价于你在页面上把每周课表翻一遍再抄下来，仅此而已。
+  </p>
+</details>
+
+<details>
+  <summary>下学期要重新弄吗？</summary>
+  <p>
+    脚本和油猴都不用重装。学期变了，脚本里写死的学期编号会一起更新 ——
+    新版本发布后，油猴会<b>定期自动检查并更新</b>，一般不用你操心。
+  </p>
+  <p>
+    想马上拿到新版：回<a href="#s3">第 3 步</a>再点一次那个安装按钮，覆盖安装就行
+    （也可以到油猴的「管理面板」里手动检查更新）。
+  </p>
+</details>
+
+<details>
+  <summary>怎么卸载？</summary>
+  <p>
+    油猴 →「管理面板」→ 删掉「山大 课表导出 → DDL Killer」这一条；不想要油猴了，就到浏览器扩展页把
+    Tampermonkey 移除。删掉<b>不影响</b>你已经导入 DDL Killer 的课表。
+  </p>
+</details>
+
+
+<!-- ══════════ 隐私 ══════════ -->
+<h2 id="privacy">安全与隐私说明</h2>
+
+<p>把话说全，你可以自己判断：</p>
+
+<div class="tw">
+  <table>
+    <tr><th>它做什么</th><th>它不做什么</th></tr>
+    <tr>
+      <td>用你浏览器里<b>已有的</b>登录态，向教务系统自己的课表接口发查询请求</td>
+      <td>不读取、不索取你的学号密码</td>
+    </tr>
+    <tr>
+      <td>把查到的课表整理成一个 JSON 文件，下载到<b>你自己的电脑</b>上</td>
+      <td>不把任何数据发送到维护者的服务器或任何第三方</td>
+    </tr>
+    <tr>
+      <td>在页面右下角画一个按钮</td>
+      <td>不写数据库、不提交、不改动教务系统的任何数据</td>
+    </tr>
+  </table>
+</div>
+
+<p>
+  想自己验证的话：脚本是一个纯文本的 <code>.user.js</code> 文件，用记事本就能打开读完。
+  搜一下代码里出现的网址，你只会看到 <code>bkzhjx.wh.sdu.edu.cn</code> 一个域名。
+</p>
+
+<h2 id="disclaimer">脚本使用声明</h2>
+<div class="box tip">
+  <p>课表导出脚本仅用于读取你本人有权访问的课表数据。请先在自己的浏览器中登录本校教务系统；脚本不参与登录，不收集账号密码，也不会修改选课或其他教务数据。</p>
+  <p>导出的文件保存在你的设备上，脚本不会向 DDL Killer、维护者或其他第三方转发任何课表数据或登录信息。之后是否将文件导入 DDL Killer 或主动提交课表样本，由你自行选择。</p>
+  <p>使用前，请确认符合本校教务系统的使用规定，并在导入后核对课程、周次和上课时间。DDL Killer 仅提供课表导出与导入的技术支持；对于违反本校规定的使用行为，或因学校系统变化、导出结果偏差等造成的后果，DDL Killer 不承担责任。</p>
+</div>
+
+<h2 id="contribute">让课表支持更多学校</h2>
+<p>不同学校的课表格式不太一样，你提供的样本能帮助我们了解课程、周次和上课时间。不知道怎么导出也没关系，可以先告诉我们学校、校区和教学平台，或提供一张课表截图。</p>
+<ol>
+  <li>优先使用教学平台自带的导出功能，保存 Excel、PDF 或 JSON。请尽量提供完整学期的课表。</li>
+  <li>没有导出功能时，打开具体课表页面，等待课程加载完成，再用浏览器保存网页。保存后打开文件检查：能否看到课程、周次、节次？如果文件里只有菜单或空白页面，可以改用导出文件，或附上课表截图。</li>
+  <li>如果页面只显示某一周，请注明并补充完整周次；校历第一周日期、节次作息表和截图也很有帮助。</li>
+  <li>打开 DDL Killer 的「我的 → 导入课表 → 提交课表样本」，填写学校和平台并添加附件。回复与奖励会发送到「消息」。</li>
+</ol>
+<p>分享前请遮盖姓名、学号等个人信息，也不要提供密码或登录信息。样本只用于了解课表格式和完善导入功能，应用内的附件最多保留 60 天，也可以在反馈详情中删除。<a href="https://ddlkiller.com/privacy.html">查看隐私说明</a><br>我们确认样本有帮助后，会通过“消息”送上 AI 体验奖励。谢谢你帮 DDL Killer 支持更多学校。🎀</p>
+<p><a href="https://app.ddlkiller.com/">打开 DDL Killer</a></p>
+<footer>
+  这份教程会帮助你从<b>山东大学教务系统导出课表</b>，再导入 DDL Killer。<br>
+  脚本用的是油猴（<span class="tamper">Tampermonkey</span>），一个通用的浏览器扩展，用于在你的浏览器中运行课表导出脚本。
+</footer>
+
+</div>
+</body>
+</html>

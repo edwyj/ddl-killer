@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="不用写代码，跟着步骤获取 DeepSeek API Key，在 DDL Killer 中配置自己的 AI 计划助手。">
+  <title>API Key 获取与配置教程 · DDL Killer</title>
+  <link rel="stylesheet" href="/site-theme.css">
+  <script src="/site-theme.js"></script>
+  <style>
+    *{box-sizing:border-box}body{margin:0;font:16px/1.8 system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif}
+    main{max-width:800px;margin:auto;padding:26px 24px 64px}h1{font-size:clamp(28px,5vw,42px);line-height:1.3;margin:22px 0 12px}h2{font-size:21px;line-height:1.5;margin:0 0 10px}
+    p{margin:10px 0}.lead,.muted{color:var(--site-muted)}.lead{font-size:18px}.step{background:var(--site-card);border:1px solid var(--site-line);border-radius:18px;padding:22px;margin:18px 0}
+    .number{color:var(--site-violet-ink);font-size:13px;font-weight:700;display:block;margin-bottom:5px}.note{padding:14px 18px;border-radius:12px;background:var(--site-violet-soft)}
+    table{width:100%;border-collapse:collapse;margin:14px 0}th,td{text-align:left;vertical-align:top;padding:10px 0;border-bottom:1px solid var(--site-line)}th{width:110px;font-weight:600}td{overflow-wrap:anywhere}
+    code{font:14px/1.6 ui-monospace,Consolas,monospace;background:var(--site-soft);padding:3px 6px;border-radius:5px;overflow-wrap:anywhere}a{color:var(--site-link);text-underline-offset:4px}a:focus-visible,summary:focus-visible{outline:2px solid var(--site-link);outline-offset:4px}
+    ol,ul{padding-left:22px}li{margin:6px 0}details{border-bottom:1px solid var(--site-line);padding:13px 0}summary{cursor:pointer;font-weight:600}footer{margin-top:28px;color:var(--site-muted);font-size:14px}
+    @media(max-width:480px){main{padding:22px 16px 44px}.step{padding:18px 16px}th{width:90px}.lead{font-size:16px}}
+  </style>
+</head>
+<body class="reading-page">
+  <div class="site-theme-bar" data-theme-control></div>
+  <main>
+    <a href="/website/help.html">← 使用帮助</a>
+    <h1>给 AI 助手接上自己的 Key</h1>
+    <p class="lead">不需要写代码。以 DeepSeek 为例，获取一串密钥，填到 DDL Killer，再测试连接就可以了。</p>
+    <p>API Key 可以理解为让软件调用你所选 AI 服务的“专用钥匙”，不是 DDL Killer 的登录密码，也不是 DeepSeek 的账号密码。</p>
+    <p class="note">DDL Killer 不收取任何软件使用费用。官方 AI 额度供新用户体验；长期使用推荐自己的 API Key，或 <a href="/mcp-help.html">通过 MCP 接入自己的智能体</a>。使用自己的 Key 时，AI 调用由对应服务商计费，费用由你承担。</p>
+
+    <section class="step" id="get-key">
+      <span class="number">第 1 步</span><h2>到 DeepSeek 官方平台获取 Key</h2>
+      <ol>
+        <li>打开 <a href="https://platform.deepseek.com/api_keys" target="_blank" rel="noopener noreferrer">DeepSeek 官方 API Key 页面</a>，按平台提示注册或登录。</li>
+        <li>进入“API keys”页面，创建一个新的 API Key。名称可以填 <strong>DDL Killer</strong>，方便以后辨认。</li>
+        <li>复制生成的完整 Key。若平台只在创建时展示一次，请当场妥善保存；以后找不到时，可以撤销旧 Key，再创建新的。</li>
+      </ol>
+      <p class="muted">请认准 <code>platform.deepseek.com</code>。只需在官方平台操作，无需把账号密码或验证码交给别人。</p>
+    </section>
+
+    <section class="step">
+      <span class="number">第 2 步</span><h2>确认 API 余额与费用</h2>
+      <p>在 DeepSeek 平台查看可用余额和用量。网页版聊天和 API 调用是不同入口；能在网页聊天，不代表 API 一定有可用余额。</p>
+      <p>API 按实际输入和输出的文字量计费，测试连接也会产生少量调用。不需要先购买大额套餐；如果余额不足，可按官方平台的规则小额充值，再根据实际使用决定是否继续。</p>
+      <p><a href="https://api-docs.deepseek.com/zh-cn/quick_start/pricing" target="_blank" rel="noopener noreferrer">查看 DeepSeek 当前价格与计费规则</a>。价格可能调整，请以官方页面为准。</p>
+    </section>
+
+    <section class="step">
+      <span class="number">第 3 步</span><h2>回到 DDL Killer，填写这四项</h2>
+      <p>打开“我的 → AI 计划助手设置”，将“模型来源”切换为 <strong>使用自己的 Key</strong>。</p>
+      <table aria-label="DeepSeek 配置填写示例">
+        <tbody>
+          <tr><th scope="row">提供商</th><td>DeepSeek</td></tr>
+          <tr><th scope="row">API 地址</th><td><code>https://api.deepseek.com/v1</code><br><span class="muted">选 DeepSeek 后自动填写，无需修改。</span></td></tr>
+          <tr><th scope="row">模型名称</th><td><code>deepseek-flash</code></td></tr>
+          <tr><th scope="row">API Key</th><td>粘贴刚才复制的完整 Key，不要填账号密码。</td></tr>
+        </tbody>
+      </table>
+      <p>我们默认推荐 <strong>Flash</strong>，适合先用于日常任务安排，费用也比 <code>deepseek-v4-pro</code> 低。无需为了使用助手改成 Pro。</p>
+      <p class="muted">截至 2026 年 10 月 9 日，官方模型名称为 <code>deepseek-flash</code> 和 <code>deepseek-v4-pro</code>。如果旧配置仍显示 <code>deepseek-chat</code>，请手动改为 <code>deepseek-flash</code>，重新填写 Key 并保存。已有配置不会自动改写；后续模型名称变化时，我们会更新默认值和教程。</p>
+      <p><a href="https://api-docs.deepseek.com/zh-cn/" target="_blank" rel="noopener noreferrer">核对 DeepSeek 官方接入说明</a></p>
+    </section>
+
+    <section class="step">
+      <span class="number">第 4 步</span><h2>先保存，再测试连接</h2>
+      <ol>
+        <li>点击 <strong>保存配置</strong>。如果提示验证账号密码，请填写你的 DDL Killer 密码后重试。</li>
+        <li>点击 <strong>测试连接</strong>。显示“连接测试成功”后，就可以打开 🎀 助手，试着描述一件想安排的事。</li>
+        <li>查看 AI 给出的方案，调整到满意后再确认。确认前不会写入任务或日程。</li>
+      </ol>
+      <p class="muted">“测试连接”使用已保存的配置。刚修改了 Key 或模型名称时，要先保存，否则测试的仍是上一次配置。</p>
+    </section>
+
+    <section class="step">
+      <h2>遇到问题时</h2>
+      <details><summary>测试连接失败，先检查什么？</summary><p>确认已保存最新配置；检查 Key 是否完整、是否已被撤销，模型名称是否为 <code>deepseek-flash</code>，以及官方平台的 API 余额。检查网络后再试一次。仍失败时，联系开发者并提供错误提示，<strong>不要发送完整 Key</strong>。</p></details>
+      <details><summary>Key 会保存在哪里？可以删除吗？</summary><p>配置保存到 DDL Killer 服务器，Key 加密存储，应用只显示掩码。使用助手时，服务器会用它向你选择的模型服务发送请求；相关任务、课程和安排也会用于生成方案。只使用你信任的服务。</p><p>在此页点击“删除配置”会删除 DDL Killer 保存的配置。若怀疑 Key 泄漏，还需要到 DeepSeek 官方平台撤销它，删除应用配置不会撤销服务商的 Key。</p></details>
+      <details><summary>可以使用其他模型服务吗？</summary><p>可以选择“自定义 OpenAI 兼容服务”，按服务商文档填写 HTTPS API 地址、模型名与 Key。保存前请核对接收 Key 的域名。不同服务的兼容性可能不同，先测试连接；不是把网页版聊天网址填进来就能使用。</p></details>
+      <details><summary>暂时不想配置 Key 可以吗？</summary><p>可以继续用官方体验额度，具体剩余次数以应用内为准；也可以通过 MCP 接入自己的智能体。清单、DDL、课表和基础日程功能不要求你购买 AI 服务。</p></details>
+    </section>
+    <footer>教程核对日期：2026 年 10 月 9 日。平台界面和模型名称可能变化，请以官方页面为准。<br><a href="https://app.ddlkiller.com">返回网页版</a> · <a href="/">返回官网</a> · <a href="/mcp-help.html">智能体连接教程</a></footer>
+  </main>
+</body>
+</html>

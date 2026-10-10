@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>Android 测试版 · DDL Killer</title>
+<script src="/site-theme.js"></script><link rel="stylesheet" href="/site-theme.css">
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,"Microsoft Yahei",sans-serif;min-height:100svh;display:grid;place-items:center;padding:84px 20px 40px}
+.theme{position:absolute;top:20px;right:20px}.card{width:100%;max-width:460px;border:1px solid var(--site-line);background:var(--site-card);box-shadow:var(--site-shadow);border-radius:30px;padding:36px 30px}
+h1{font-size:26px;margin:18px 0 10px}p{line-height:1.7;color:var(--site-muted);margin:12px 0}.badge{display:inline-block;background:var(--site-violet-soft);color:var(--site-violet-ink);padding:7px 12px;border-radius:20px;font-size:13px}
+label{display:block;margin:18px 0 8px;font-size:14px}input{font:inherit;width:100%;border:1px solid var(--site-line);border-radius:14px;padding:14px;background:var(--site-solid);color:var(--site-ink)}
+input:focus-visible{outline:2px solid var(--site-link);outline-offset:2px}.primary{display:block;width:100%;text-align:center;text-decoration:none;border:0;border-radius:14px;padding:15px;margin-top:24px;background:linear-gradient(110deg,#e3597c,#9470cf);color:white;font:inherit;font-weight:650;cursor:pointer}
+button:disabled{cursor:wait;opacity:.75}.secondary{color:var(--site-link);background:none;border:0;padding:8px 0;font:inherit;cursor:pointer}.links{margin-top:24px;text-align:center}.links a{color:var(--site-link)}
+#status{font-size:14px;min-height:24px}#error{color:var(--site-pink-ink)}details{margin-top:24px;color:var(--site-muted);font-size:14px;line-height:1.7}summary{cursor:pointer}small{color:var(--site-faint)}[hidden]{display:none!important}
+</style></head><body>
+<div class="theme" data-theme-control></div>
+<main class="card"><span class="badge">Beta · 仅供测试</span><h1>DDL Killer · Android 测试版</h1>
+<p>提前体验正在调整的功能。测试版可能存在问题，数据与正式版独立，也可以与正式版同时安装。</p>
+<p id="status" role="status" aria-live="polite">正在检查登录状态…</p>
+<form id="login" hidden><p>请使用已开通测试权限的账号登录，密码与正式账号相同。</p>
+<label for="username">账号</label><input id="username" autocomplete="username" required maxlength="32">
+<label for="password">密码</label><input id="password" type="password" autocomplete="current-password" required>
+<button id="submit" class="primary" type="submit">登录并获取安装包</button></form>
+<section id="ready" hidden><p id="version"></p><a id="download" class="primary" href="/api/beta/apk">下载 Android 测试版</a><small>约 <span id="size"></span> MB</small></section>
+<p id="error" role="alert"></p><button id="retry" class="secondary" hidden>重新检查</button>
+<details><summary>安装说明</summary><p>请在手机浏览器中下载。如系统提示需要允许安装，请按提示仅允许当前浏览器安装应用。测试账号与正式版同名，使用原来的密码登录即可。</p></details>
+<div class="links"><a href="/">打开 Beta 网页</a></div></main>
+<script src="/beta-download.js"></script></body></html>

@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="把 Claude Code、Codex 或 OpenClaw 安全连接到 DDL Killer，让智能体协助管理任务与日程。">
+<meta name="theme-color" content="#f8f5ef">
+<title>智能体连接教程 · DDL Killer</title>
+<style>
+:root{--paper:#f8f5ef;--card:#fffdf9;--ink:#24211d;--muted:#746d63;--line:#dfd8cd;--blue:#3567d6;--blue-soft:#eaf0ff;--green:#167b59;--green-soft:#e8f6ef;--orange:#b65f22;--orange-soft:#fff0e4;--shadow:0 16px 45px rgba(72,57,35,.09)}
+*{box-sizing:border-box}html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.75 system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 12% 3%,rgba(53,103,214,.12),transparent 28rem),radial-gradient(circle at 88% 18%,rgba(22,123,89,.09),transparent 25rem)}
+.wrap{position:relative;max-width:920px;margin:auto;padding:54px 22px 100px}
+.hero{display:grid;grid-template-columns:1.25fr .75fr;gap:30px;align-items:center;margin-bottom:42px}
+.eyebrow{color:var(--blue);font-size:13px;font-weight:800;letter-spacing:.13em;text-transform:uppercase}
+h1{font-size:clamp(34px,6vw,60px);line-height:1.08;letter-spacing:-.045em;margin:10px 0 18px;max-width:690px}
+.lead{font-size:18px;color:var(--muted);max-width:650px;margin:0}
+.flow{background:var(--card);border:1px solid var(--line);border-radius:26px;padding:22px;box-shadow:var(--shadow)}
+.node{border:1px solid var(--line);background:#fff;border-radius:14px;padding:12px 14px;font-weight:750;text-align:center}.node strong{display:block;color:var(--blue);font-size:13px}.arrow{text-align:center;color:var(--muted);font-size:22px;line-height:1.2;padding:5px}
+nav{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 36px}nav a{color:var(--ink);text-decoration:none;background:rgba(255,255,255,.72);border:1px solid var(--line);border-radius:99px;padding:6px 13px;font-size:14px}
+section{scroll-margin-top:18px;margin:28px 0}.panel{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:26px;box-shadow:0 4px 18px rgba(72,57,35,.04)}
+h2{font-size:25px;line-height:1.25;letter-spacing:-.02em;margin:0 0 12px}h3{font-size:18px;margin:24px 0 8px}p{margin:10px 0}a{color:var(--blue)}
+.steps{counter-reset:step;display:grid;gap:12px;margin:20px 0}.step{counter-increment:step;display:grid;grid-template-columns:40px 1fr;gap:14px;align-items:start}.step:before{content:counter(step);width:36px;height:36px;border-radius:12px;background:var(--blue);color:#fff;display:grid;place-items:center;font-weight:800}.step b{display:block}.step span{color:var(--muted)}
+.choice{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}.choice article{border:1px solid var(--line);border-radius:15px;padding:15px;background:#fff}.choice article:nth-child(2){border-color:#a9bee9;background:var(--blue-soft)}.tag{display:inline-block;border-radius:99px;padding:2px 8px;background:var(--blue);color:#fff;font-size:12px;font-weight:750}
+.clients{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.client{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px}.client h3{margin:0 0 8px}.client p{color:var(--muted);font-size:14px}
+pre{overflow:auto;background:#24262b;color:#f4f0e8;border-radius:13px;padding:15px;font:13px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre-wrap;word-break:break-word}code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}.inline{background:#eee9e0;border-radius:5px;padding:2px 6px;font-size:14px}
+.note{border-left:4px solid var(--blue);background:var(--blue-soft);border-radius:10px;padding:13px 15px;margin:16px 0}.safe{border-left-color:var(--green);background:var(--green-soft)}.warn{border-left-color:var(--orange);background:var(--orange-soft)}
+.caps{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.cap{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff}.cap b{display:block}.cap span{color:var(--muted);font-size:14px}
+details{border-top:1px solid var(--line);padding:13px 0}summary{cursor:pointer;font-weight:700}details p{color:var(--muted)}
+footer{text-align:center;color:var(--muted);font-size:13px;margin-top:50px}
+@media(max-width:760px){.wrap{padding-top:34px}.hero{grid-template-columns:1fr}.flow{max-width:420px}.choice,.clients,.caps{grid-template-columns:1fr}.panel{padding:20px}h1{font-size:39px}}
+</style><link rel="stylesheet" href="/site-theme.css">
+<script src="/site-theme.js"></script></head>
+<body class="reading-page"><div class="site-theme-bar" data-theme-control></div><main class="wrap">
+<header class="hero">
+<div><div class="eyebrow">DDL Killer × MCP</div><h1>让智能体真正帮你安排时间</h1><p class="lead">连接后，你可以直接对 Claude Code、Codex 或 OpenClaw 说“把这周的任务安排一下”。它只会获得你明确允许的权限，连接也能随时撤销。</p></div>
+<div class="flow" aria-label="连接流程示意图"><div class="node"><strong>你使用的智能体</strong>Claude Code · Codex · OpenClaw</div><div class="arrow">↓ 安全授权</div><div class="node"><strong>MCP</strong>只转交已允许的操作</div><div class="arrow">↓</div><div class="node"><strong>DDL Killer</strong>任务 · 清单 · 课程 · 排期</div></div>
+</header>
+<nav><a href="#what">什么是 MCP</a><a href="#start">三步连接</a><a href="#clients">客户端示例</a><a href="#permissions">权限</a><a href="#safety">安全与撤销</a><a href="#faq">常见问题</a></nav>
+<section id="what" class="panel"><h2>什么是 MCP？</h2><p>MCP 可以理解为“智能体与应用之间的通用插座”。平时聊天时，智能体只能给你建议；连接 DDL Killer 后，它可以在你授权的范围内读取计划、创建任务，并先生成排期草案让你确认。</p>
+<div class="caps"><div class="cap"><b>读懂你的安排</b><span>查看清单、DDL、课程和已有日程。</span></div><div class="cap"><b>帮你记录任务</b><span>把对话里的事项直接加入 DDL Killer。</span></div><div class="cap"><b>生成排期草案</b><span>先预览多个安排，再一次性应用。</span></div><div class="cap"><b>主动避免冲突</b><span>课程冲突会阻止应用，普通重叠会明确提醒。</span></div></div></section>
+<section id="start" class="panel"><h2>三步完成连接</h2><div class="steps">
+<div class="step"><div><b>在 DDL Killer 打开“我的 → 智能体连接”</b><span>这里可以创建、查看和撤销所有连接。</span></div></div>
+<div class="step"><div><b>优先选择 OAuth</b><span>客户端会打开浏览器让你登录并确认权限，不需要复制令牌。客户端不支持 OAuth 时，再创建手动令牌。</span></div></div>
+<div class="step"><div><b>把 MCP 地址交给客户端</b><span>地址是 <code class="inline">https://ddlkiller.com/mcp</code>。连接成功后，可以先让智能体“列出我的清单”测试。</span></div></div></div>
+<div class="note safe"><b>推荐：</b>先选“任务与规划（推荐）”。它足够完成日常读取、创建任务和排期，又不包含永久删除权限。</div></section>
+<section id="clients"><h2>常见客户端示例</h2><div class="clients">
+<article class="client"><h3>Claude Code</h3><p>添加远程 HTTP MCP，然后在浏览器中授权。</p><pre>claude mcp add --transport http --scope user ddl-killer https://ddlkiller.com/mcp
+claude mcp login ddl-killer</pre></article>
+<article class="client"><h3>Codex</h3><p>添加服务器后执行登录，Codex 会启动 OAuth 流程。</p><pre>codex mcp add ddl-killer --url https://ddlkiller.com/mcp
+codex mcp login ddl-killer</pre></article>
+<article class="client"><h3>OpenClaw</h3><p>当前建议在 DDL Killer 创建手动令牌，再写入连接配置。</p><pre>openclaw mcp set ddl-killer '{"url":"https://ddlkiller.com/mcp","transport":"streamable-http","headers":{"Authorization":"Bearer &lt;你的令牌&gt;"}}'</pre></article>
+</div><div class="note warn"><b>命令因客户端版本不同可能略有变化。</b>如果客户端已经提供“添加 MCP”界面，只需选择远程 HTTP / Streamable HTTP，填入上面的 MCP 地址，然后选择 OAuth 或 Bearer Token。</div></section>
+<section id="permissions" class="panel"><h2>权限怎么选？</h2><div class="choice">
+<article><b>只读</b><p>只能查看计划，适合总结和问答。</p></article>
+<article><span class="tag">推荐</span><br><b>任务与规划（推荐）</b><p>可创建、修改任务，生成并应用排期草案。</p></article>
+<article><b>完整管理</b><p>额外允许删除与永久清理，只在确有需要时开启。</p></article></div>
+<h3>排期为什么分“草案”和“应用”？</h3><p>智能体可以先生成整套方案供你检查；只有继续要求应用，日程才会真正改变。过期草案会被拒绝，课程冲突也不会被强行写入。</p></section>
+<section id="safety" class="panel"><h2>令牌与撤销</h2><div class="note"><b>手动令牌只显示一次。</b>创建后立刻保存到客户端的安全配置中，不要发到聊天、截图或公开文件里。服务器不会保存可还原的令牌原文。</div><p>不再使用某个客户端时，回到“智能体连接”，找到对应连接并点右侧的断开图标。撤销立即生效，客户端的下一次请求会被拒绝。若怀疑令牌泄漏，直接撤销并重新创建即可。</p></section>
+<section id="faq" class="panel"><h2>常见问题</h2>
+<details><summary>连接成功后可以直接让 AI 自动改日程吗？</summary><p>可以，但推荐让它先生成草案并解释安排，再由你确认应用。这样更容易发现时间偏好或优先级理解错误。</p></details>
+<details><summary>为什么显示未授权或 401？</summary><p>OAuth 可能尚未完成，或手动令牌已过期、被撤销。重新登录，或在 DDL Killer 中创建一个新连接。</p></details>
+<details><summary>换手机或浏览器需要重新连接吗？</summary><p>通常不需要。连接属于你的账号和智能体客户端，不依赖当前打开 DDL Killer 的设备。</p></details>
+<details><summary>AI 会看到我的密码吗？</summary><p>不会。OAuth 只把授权结果交给客户端；创建手动令牌时，账号密码也只用于确认是你本人。</p></details></section>
+<footer>DDL Killer 智能体连接教程 · MCP 地址：ddlkiller.com/mcp</footer>
+</main></body></html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DDL Killer · 安卓版下载</title>
+<style>
+  :root { --red:#C1301F; --ink:#1A191B; --muted:#8A9098; --bg:#F2F4F6; }
+  * { box-sizing:border-box; }
+  body {
+    margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+    background:var(--bg); font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    color:var(--ink); padding:24px;
+  }
+  .card {
+    width:100%; max-width:420px; background:#fff; border-radius:20px; padding:34px 28px;
+    box-shadow:0 12px 40px rgba(34,37,43,.08); text-align:center;
+  }
+  .logo { font-size:40px; margin-bottom:6px; }
+  h1 { font-size:22px; font-weight:800; margin:0 0 6px; }
+  .sub { color:var(--muted); font-size:13px; margin:0 0 24px; }
+  .icon { width:76px; height:76px; border-radius:18px; overflow:hidden;
+    margin:0 auto 18px; box-shadow:0 6px 20px rgba(0,0,0,.18); }
+  .icon img { width:100%; height:100%; object-fit:cover; display:block; }
+  .meta { display:flex; justify-content:center; gap:12px; margin-bottom:26px; flex-wrap:wrap; }
+  .chip { background:#F2F4F6; color:var(--muted); font-size:12px; padding:6px 12px; border-radius:999px; }
+  a.dl {
+    display:block; width:100%; padding:15px; border-radius:14px; background:var(--red); color:#fff;
+    text-decoration:none; font-size:16px; font-weight:700; box-shadow:0 6px 18px rgba(193,48,31,.35);
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  a.dl:hover { transform:translateY(-1px); box-shadow:0 10px 24px rgba(193,48,31,.45); }
+  .note { color:var(--muted); font-size:12px; margin-top:22px; line-height:1.7; }
+  .note b { color:var(--ink); }
+</style><link rel="stylesheet" href="/site-theme.css">
+<script src="/site-theme.js"></script></head>
+<body class="download-page"><div class="site-theme-bar" data-theme-control></div>
+  <div class="card">
+
+    <h1>DDL Killer · 安卓版</h1>
+    <p class="sub">AI 安排、清单、DDL 与课表，随身带走</p>
+    <div class="icon"><img src="icons/Icon-512.png" alt="DDL Killer"></div>
+    <div class="meta">
+      <span class="chip">Android</span>
+      <span class="chip" id="version">正在读取版本</span>
+
+    </div>
+    <a class="dl" href="app-release.apk" download="DDL-Killer.apk">⬇ 下载安卓版 APK</a>
+    <p class="note">
+      手机浏览器打开本页，点上方按钮即可下载。<br>
+      安装时若提示"未知来源"，请在系统设置里允许安装。<br>
+      使用自己的账号登录，或在应用内注册。<br><a href="https://app.ddlkiller.com">使用网页版</a> · <a href="/">返回官网</a>
+    </p>
+  </div>
+<script>
+fetch('/app-update.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error();return r.json()}).then(m=>{
+ const u=new URL(m.apk_url);
+ if(u.protocol!=='https:'||u.hostname!=='ddlkiller.com'||!/^\/releases\/ddl-killer-[\d.-]+\.apk$/.test(u.pathname))throw Error();
+ document.getElementById('version').textContent='v'+m.version;
+ document.querySelector('a.dl').href=u.href;
+}).catch(()=>{document.getElementById('version').textContent='当前发布版'});
+</script>
+</body>
+</html>

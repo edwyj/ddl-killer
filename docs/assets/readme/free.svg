@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="112" height="26" role="img" aria-label="Software: free">
+  <title>Software: free</title>
+  <defs><linearGradient id="g"><stop stop-color="#bd4e70"/><stop offset="1" stop-color="#7861b2"/></linearGradient><clipPath id="r"><rect width="112" height="26" rx="6"/></clipPath></defs>
+  <g clip-path="url(#r)"><path fill="#44394f" d="M0 0h70v26H0z"/><path fill="url(#g)" d="M70 0h42v26H70z"/></g>
+  <g fill="#fff" text-anchor="middle" font-family="Verdana,DejaVu Sans,sans-serif" font-size="11"><text x="35" y="17">software</text><text x="91" y="17">free</text></g>
+</svg>

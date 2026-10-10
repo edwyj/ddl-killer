@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+
+    This is a placeholder for base href that will be replaced by the value of
+    the `--base-href` argument provided to `flutter build`.
+  -->
+  <base href="$FLUTTER_BASE_HREF">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="DDL Killer — AI 计划助手、清单、DDL、课表与每日时间轴">
+  <meta name="theme-color" content="#FDF9F6">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="DDL Killer">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <title>DDL Killer</title>
+  <link rel="manifest" href="manifest.json">
+<script src="/site-theme.js"></script>
+  <style>
+    html[data-theme=light],html[data-theme=light] body{background:#fffdfd}
+    html[data-theme=dark],html[data-theme=dark] body{background:#201c24}
+    /* Flutter owns the reveal toggle. Hide the browser's extra password eye. */
+    input[type=password]::-ms-reveal,
+    input[type=password]::-ms-clear { display:none !important; }
+  </style>
+</head>
+<body>
+  <!--
+    You can customize the "flutter_bootstrap.js" script.
+    This is useful to provide a custom configuration to the Flutter loader
+    or to give the user feedback during the initialization process.
+
+    For more details:
+    * https://docs.flutter.dev/platform-integration/web/initialization
+  -->
+  <script src="reminder-client.js"></script>
+  <script src="offline-client.js"></script>
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>

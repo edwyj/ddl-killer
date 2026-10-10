@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+const pub=readFileSync('pubspec.yaml','utf8').match(/^version:\s*([0-9.]+)\+([0-9]+)$/m);
+const source=readFileSync('lib/app_version.dart','utf8');
+const manifest=JSON.parse(readFileSync('web/app-update.json','utf8'));
+assert.ok(pub);
+assert.match(source,new RegExp(`name = '${pub[1].replaceAll('.','\\.')}';`));
+assert.match(source,new RegExp(`build = ${pub[2]};`));
+assert.equal(manifest.version,pub[1]);
+assert.equal(manifest.build_number,Number(pub[2]));
+assert.equal(manifest.apk_url,`https://ddlkiller.com/releases/ddl-killer-${pub[1]}-${pub[2]}.apk`);
+assert.ok(manifest.notes.length>=20);
+const about=readFileSync('lib/screens/about_screen.dart','utf8');
+assert.equal(source.match(/static const notes\s*=\s*'([^']*)';/s)?.[1], manifest.notes, 'Bundled latest release notes must match manifest');
+assert.ok(about.includes('AppVersion.notes'), 'About must show bundled release notes when offline');
+console.log(`Release manifest aligned: ${pub[1]}+${pub[2]}`);

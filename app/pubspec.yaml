@@ -1,0 +1,61 @@
+name: plan_app
+description: 面向中国大学生的课表、任务与 AI 辅助安排工具
+publish_to: 'none'
+version: 0.13.2+60
+
+environment:
+  sdk: ^3.13.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.2.0
+  shared_preferences: ^2.3.0
+  intl: ^0.20.0
+  url_launcher: ^6.3.2
+  lunar: ^1.7.8
+  image_picker: ^1.2.3
+  flutter_svg: ^2.3.0
+  desktop_drop: ^0.8.4
+  flutter_local_notifications: ^22.3.0
+  timezone: ^0.11.1
+  flutter_secure_storage: ^11.1.1
+  file_picker: ^12.3.0
+  sembast: ^3.8.10
+  sembast_web: ^2.4.6
+  path_provider: ^2.1.6
+  uuid: ^4.6.0
+  characters: ^1.4.0
+  record: 7.1.1
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.14.1
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/icon/app_icon.png"
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/icon/app_icon_fg.png"  # 艺术字居中在安全区
+  min_sdk_android: 21
+  web:
+    generate: true
+    image_path: "assets/icon/app_icon.png"
+    background_color: "#FFFFFF"
+    theme_color: "#FFFDFD"
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/icon/app_icon.png
+    - assets/fonts/NotoSansSC-LICENSE.txt
+    - assets/fonts/NotoColorEmoji-LICENSE.txt
+  fonts:
+    - family: NotoSansSC
+      fonts:
+        - asset: assets/fonts/NotoSansSC.ttf
+    - family: NotoColorEmoji
+      fonts:
+        - asset: assets/fonts/NotoColorEmoji.ttf

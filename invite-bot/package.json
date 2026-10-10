@@ -1,0 +1,1 @@
+{"name":"ddl-invite-bot","private":true,"type":"module","scripts":{"start":"node src/index.js","test":"node --test"},"dependencies":{"@larksuiteoapi/node-sdk":"1.74.0"}}

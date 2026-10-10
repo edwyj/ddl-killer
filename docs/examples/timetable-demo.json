@@ -1,0 +1,86 @@
+{
+  "semester": "2026-2027-1（虚构示例）",
+  "semester_start": "2026-08-31",
+  "period_times": {
+    "1": ["08:00", "09:35"],
+    "2": ["09:55", "11:30"],
+    "3": ["14:00", "15:35"],
+    "4": ["15:55", "17:30"]
+  },
+  "period_to_block": {
+    "1": 1,
+    "2": 1,
+    "3": 2,
+    "4": 2,
+    "5": 3,
+    "6": 3,
+    "7": 4,
+    "8": 4
+  },
+  "time_note": "所有课程、教师、教室、作息和学期均为虚构示例，不代表任何学校。",
+  "week_source": "虚构校历：第 1 周周一为 2026-08-31",
+  "courses": [
+    {
+      "course_id": "demo-mathematics",
+      "name": "示例数学课",
+      "teacher": "示例教师甲",
+      "slots": [
+        {
+          "section": 1,
+          "group": "",
+          "weekday": 1,
+          "periods": [1, 2],
+          "weeks": [1, 2, 3, 4],
+          "room": "虚构楼 A101"
+        },
+        {
+          "section": 2,
+          "group": "示例习题班",
+          "weekday": 3,
+          "periods": [3, 4],
+          "weeks": [1, 3],
+          "room": "虚构楼 A102"
+        }
+      ]
+    },
+    {
+      "course_id": "demo-programming",
+      "name": "示例程序设计课",
+      "teacher": "示例教师乙",
+      "slots": [
+        {
+          "section": 1,
+          "group": "",
+          "weekday": 2,
+          "periods": [5, 6],
+          "weeks": [2, 4],
+          "room": "虚构楼 B201"
+        }
+      ]
+    },
+    {
+      "course_id": "demo-laboratory",
+      "name": "示例实验课",
+      "teacher": "示例教师丙",
+      "slots": [
+        {
+          "section": 1,
+          "group": "示例第 1 组",
+          "weekday": 5,
+          "periods": [7, 8],
+          "weeks": [2, 3],
+          "room": "虚构楼 C301"
+        },
+        {
+          "section": 2,
+          "group": "示例第 1 组",
+          "weekday": 5,
+          "periods": [7, 8],
+          "weeks": [4],
+          "room": "虚构楼 C302"
+        }
+      ]
+    }
+  ],
+  "no_fixed_time": []
+}

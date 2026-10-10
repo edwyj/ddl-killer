@@ -1,0 +1,67 @@
+# 源码进入仓库；凭据、运行数据和本机构建材料保留在本机。
+
+# 凭据与私有环境配置
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.jks
+*.keystore
+
+# 运行时数据（包括 SQLite 临时文件）
+backend/data/
+/invite-bot-state/
+*.db
+*.db-*
+*.sqlite*
+
+# 依赖与构建产物
+node_modules/
+app/build/
+app/.dart_tool/
+app/.flutter-plugins-dependencies
+.release-v*/
+.rollback-v*/
+*.tar.gz
+*.log
+
+# 本机工具、笔记与临时材料；不影响子目录中的源码和资源
+/.claude/
+/.codex/
+/.superpowers/
+/.worktrees/
+/_*/
+/v[0-9]*/
+/*.local.*
+/*_notes.md
+/deploy*.ps1
+/*.png
+/*.jpg
+/*.gif
+/*.py
+/*.mjs
+/*.js
+/*.sh
+
+# 公开文档与演示素材；新增公开文档时同步补充此清单
+/docs/*
+!/docs/assets/
+!/docs/examples/
+!/docs/ci.md
+!/docs/developer-guide.md
+!/docs/school-timetable-export.md
+!/docs/self-hosting.md
+
+# 自部署配置与证书
+/compose.self-host.yaml
+/Caddyfile.self-host
+/caddy-local-root.crt
+
+# 只保留分发页面与虚构配置示例
+/ops/*
+!/ops/.gitignore
+!/ops/beta-download.html
+!/ops/beta-download.js
+!/ops/beta-notes.json
+!/ops/beta-accounts.example.json

@@ -1,0 +1,56 @@
+# Local self-hosting example. Read docs/self-hosting.md before starting.
+services:
+  plan-api:
+    build: ./backend
+    restart: unless-stopped
+    networks: [internal]
+    env_file: .env.self-host
+    environment:
+      PORT: "3000"
+      DB_PATH: /app/data/plan.db
+      SCHEDULE_PATH: /app/no-legacy-schedule.json
+    volumes:
+      - ddl_data:/app/data
+
+  public-mcp:
+    build:
+      context: ./mcp-server
+      dockerfile: public/Dockerfile
+    restart: unless-stopped
+    networks: [internal]
+    user: node
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=16m
+    environment:
+      NODE_ENV: production
+      PORT: "8787"
+      PLAN_INTERNAL_BASE: http://plan-api:3000
+      PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:?PUBLIC_ORIGIN is required}
+    depends_on:
+      - plan-api
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    networks: [internal]
+    ports:
+      - "127.0.0.1:8443:8443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./app/build/web:/srv/web:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - plan-api
+      - public-mcp
+
+volumes:
+  ddl_data:
+  caddy_data:
+  caddy_config:
+
+networks:
+  internal:

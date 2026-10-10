@@ -1,0 +1,40 @@
+# Local HTTPS example; use your own domain and TLS settings for public hosting.
+https://localhost:8443 {
+    tls internal
+    encode gzip
+    header {
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "no-referrer"
+        Permissions-Policy "geolocation=(), microphone=(self)"
+    }
+
+    handle /api/internal/* {
+        respond "Not found" 404
+    }
+    handle /api/* {
+        reverse_proxy plan-api:3000 {
+            header_up X-Forwarded-For {remote_host}
+        }
+    }
+    handle /mcp {
+        reverse_proxy public-mcp:8787
+    }
+    handle /.well-known/oauth-protected-resource* {
+        reverse_proxy public-mcp:8787
+    }
+    handle /.well-known/oauth-authorization-server {
+        reverse_proxy plan-api:3000
+    }
+    handle /oauth/authorize {
+        root * /srv/web
+        rewrite * /index.html
+        file_server
+    }
+    handle {
+        root * /srv/web
+        header Cache-Control "no-cache, no-store, must-revalidate"
+        try_files {path} /index.html
+        file_server
+    }
+}

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="164" height="26" role="img" aria-label="Web and Android">
+  <title>Web and Android</title>
+  <defs><linearGradient id="g"><stop stop-color="#bd4e70"/><stop offset="1" stop-color="#7861b2"/></linearGradient><clipPath id="r"><rect width="164" height="26" rx="6"/></clipPath></defs>
+  <g clip-path="url(#r)"><path fill="#44394f" d="M0 0h56v26H0z"/><path fill="url(#g)" d="M56 0h108v26H56z"/></g>
+  <g fill="#fff" text-anchor="middle" font-family="Verdana,DejaVu Sans,sans-serif" font-size="11"><text x="28" y="17">client</text><text x="110" y="17">Web · Android</text></g>
+</svg>

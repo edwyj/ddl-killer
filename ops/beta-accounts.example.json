@@ -1,0 +1,8 @@
+{
+  "_note": [
+    "复制为 ops/beta-accounts.json，填入你自己明确授权的测试账号。",
+    "真实账号名单仅保存在本机，不提交 Git；配置后按维护文档重新部署 Beta。",
+    "下面的名称是示例，不会自动创建账号。"
+  ],
+  "accounts": ["example-tester"]
+}

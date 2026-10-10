@@ -1,0 +1,23 @@
+import assert from 'node:assert/strict';
+import {execFileSync} from 'node:child_process';
+import {existsSync,readdirSync,readFileSync} from 'node:fs';
+import path from 'node:path';
+const [apk,channel,explicitVersion,explicitBuild]=process.argv.slice(2);
+assert(['stable','beta'].includes(channel));
+const sdk=process.env.ANDROID_HOME??process.env.ANDROID_SDK_ROOT??path.join(process.env.USERPROFILE??process.env.HOME,'android-sdk');
+const builds=path.join(sdk,'build-tools');
+const aapt=readdirSync(builds).sort((a,b)=>b.localeCompare(a,undefined,{numeric:true}))
+  .map(version=>path.join(builds,version,process.platform==='win32'?'aapt.exe':'aapt')).find(existsSync);
+assert(aapt);
+const output=execFileSync(aapt,['dump','badging',apk],{encoding:'utf8'});
+const metadata=output.match(/package: name='([^']+)' versionCode='([^']+)' versionName='([^']+)'/);
+assert(metadata);
+assert.equal(metadata[1],'com.aliceandandy.plan_app'+(channel==='beta'?'.beta':''));
+const source=readFileSync('pubspec.yaml','utf8').match(/^version:\s*([0-9.]+)\+([0-9]+)$/m);
+assert(source);
+const version=explicitVersion??source[1],build=explicitBuild??source[2];
+assert.equal(metadata[2],build);
+assert.equal(metadata[3],version);
+assert.equal(channel==='beta',/-beta\.\d+$/.test(version));
+assert(output.includes(`application-label:'DDL Killer${channel==='beta'?' Beta':''}'`));
+console.log(`APK verified: ${metadata[1]} ${version}+${build}`);

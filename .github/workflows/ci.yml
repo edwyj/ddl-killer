@@ -1,0 +1,136 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/ci.yml'
+      - 'backend/**'
+      - 'app/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/ci.yml'
+      - 'backend/**'
+      - 'app/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend tests (Node 24)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Run isolated backend tests
+        run: npm test
+
+  flutter:
+    name: Flutter analysis and core tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      FLUTTER_VERSION: '3.47.2'
+      FLUTTER_REVISION: d3b14c876900e553bc736ca19295fc09e3853e8e
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Node.js for the offline API fixture
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - name: Install locked backend fixture dependencies
+        working-directory: backend
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Cache the pinned Flutter SDK and pub packages
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ${{ runner.tool_cache }}/flutter-${{ env.FLUTTER_VERSION }}
+            ~/.pub-cache
+          key: ${{ runner.os }}-flutter-${{ env.FLUTTER_REVISION }}-${{ hashFiles('app/pubspec.lock') }}
+      - name: Install and verify the official Flutter SDK
+        env:
+          FLUTTER_ROOT: ${{ runner.tool_cache }}/flutter-${{ env.FLUTTER_VERSION }}
+        shell: bash
+        run: |
+          if [ ! -x "$FLUTTER_ROOT/bin/flutter" ]; then
+            git init "$FLUTTER_ROOT"
+            git -C "$FLUTTER_ROOT" remote add origin https://github.com/flutter/flutter.git
+            git -C "$FLUTTER_ROOT" fetch --depth 1 origin "refs/tags/$FLUTTER_VERSION:refs/tags/$FLUTTER_VERSION"
+            git -C "$FLUTTER_ROOT" checkout --detach "$FLUTTER_REVISION"
+          fi
+          test "$(git -C "$FLUTTER_ROOT" rev-parse HEAD)" = "$FLUTTER_REVISION"
+          echo "$FLUTTER_ROOT/bin" >> "$GITHUB_PATH"
+          "$FLUTTER_ROOT/bin/flutter" config --no-analytics
+          "$FLUTTER_ROOT/bin/flutter" --version
+      - name: Install locked Flutter dependencies
+        working-directory: app
+        run: flutter pub get --enforce-lockfile
+      - name: Analyze Dart source and tests
+        working-directory: app
+        run: flutter analyze --no-pub --no-fatal-infos lib test
+      - name: Run core Flutter tests
+        working-directory: app
+        # Golden files were recorded on Windows; keep this Linux gate behavioral.
+        run: |
+          flutter test --no-pub --concurrency=2 --timeout=2m \
+            test/ai_advanced_planner_test.dart \
+            test/ai_assistant_state_test.dart \
+            test/ai_display_text_test.dart \
+            test/ai_history_models_test.dart \
+            test/ai_offline_exclusion_test.dart \
+            test/ai_planner_sheet_test.dart \
+            test/ai_settings_screen_test.dart \
+            test/app_updates_test.dart \
+            test/beta_refresh_sync_test.dart \
+            test/ddl_screen_test.dart \
+            test/login_download_test.dart \
+            test/login_web_layout_test.dart \
+            test/mcp_connections_screen_test.dart \
+            test/mcp_oauth_consent_screen_test.dart \
+            test/network_client_test.dart \
+            test/offline_projection_test.dart \
+            test/offline_sync_test.dart \
+            test/overdue_postpone_test.dart \
+            test/schedule_file_import_test.dart \
+            test/secret_text_field_test.dart \
+            test/security_storage_test.dart \
+            test/task_completion_control_test.dart \
+            test/task_planning_ui_test.dart \
+            test/timeline_drag_test.dart \
+            test/week_overlap_test.dart \
+            test/week_zoom_test.dart
+      - name: Check the Beta update and download boundary
+        working-directory: app
+        run: >-
+          flutter test --no-pub --concurrency=2 --timeout=2m
+          --dart-define=RELEASE_CHANNEL=beta
+          test/beta_update_channel_test.dart
+          test/about_download_channel_test.dart
+          test/login_download_test.dart
